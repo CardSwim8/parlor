@@ -1,0 +1,4 @@
+/* Hub card art for this game (loaded by the Parlor hub with brand.css). */
+/* Slide Rule: a strip of vellum board with a robot sliding toward its target */
+.art.slide{padding:8px;overflow:hidden}
+.art.slide svg{width:100%;height:100%;border-radius:var(--r-sm);display:block}

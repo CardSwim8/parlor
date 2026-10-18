@@ -1,0 +1,7 @@
+/* Hub card art for this game (loaded by the Parlor hub with brand.css). */
+/* Tumbleword: a few dice on the tray */
+.art.dice{gap:10px}
+.art.dice .tile{width:56px;height:56px;font-size:30px;font-family:var(--font-display)}
+.art.dice .tile:nth-child(odd){transform:rotate(-5deg)}
+.art.dice .tile:nth-child(even){transform:rotate(4deg) translateY(5px)}
+@media (max-width:480px){ .art.dice .tile{width:48px;height:48px;font-size:26px} }

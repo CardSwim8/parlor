@@ -1,0 +1,4 @@
+/* Hub card art for this game (loaded by the Parlor hub with brand.css). */
+/* Eyeful: a strip of the busy picture */
+.art.scene{padding:0;overflow:hidden;position:relative;background:var(--paper);box-shadow:inset 0 0 0 6px var(--surface)}
+.art.scene span{position:absolute;font-size:30px;line-height:1}

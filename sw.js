@@ -1,11 +1,20 @@
-/* Offline cache for the Boggle board.
-   First visit (online): saves the page and dictionary on the device.
+/* Offline cache for Parlor and every game in it.
+   First visit (online): saves the pages, shared files and dictionaries on the device.
    Later visits: opens instantly from the saved copy, even offline, and quietly checks
    the website for updates in the background (picked up on the next launch).
-   If you change the list of files below, also change CACHE so devices refresh it. */
-const CACHE = "boggle-v1";
-const FILES = ["./", "./index.html", "./dict-words.bin", "./dict-defs.bin",
-               "./manifest.webmanifest", "./icon-180.png", "./icon-512.png"];
+   When you add a game or change the list of files below, also change CACHE so devices refresh it. */
+const CACHE = "parlor-v7";
+// Only the games listed on the hub are cached; the others in the repo still open online.
+const FILES = [
+  "./", "./index.html", "./manifest.webmanifest", "./icons/icon-180.png", "./icons/icon-512.png",
+  "./icons/tumbleword-180.png", "./icons/cover-story-180.png", "./icons/triad-180.png",
+  "./shared/theme.css", "./shared/core.js", "./shared/vendor/fflate.min.js", "./shared/words/nouns.js",
+  "./tumbleword/", "./tumbleword/index.html", "./tumbleword/brand.css", "./tumbleword/card.html", "./tumbleword/card.css",
+  "./tumbleword/tumbleword.js", "./tumbleword/dict-words.bin", "./tumbleword/dict-defs.bin",
+  "./cover-story/", "./cover-story/index.html", "./cover-story/brand.css", "./cover-story/card.html", "./cover-story/card.css",
+  "./cover-story/cover-story.js",
+  "./triad/", "./triad/index.html", "./triad/brand.css", "./triad/card.html", "./triad/card.css", "./triad/triad.js"
+];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES)).then(() => self.skipWaiting()));

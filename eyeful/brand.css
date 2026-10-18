@@ -1,0 +1,21 @@
+/* Eyeful brand: a picture book under a kaleidoscope. Warm cream page, a deep teal frame around the
+   scene, jewel-tone accents, chunky slab-serif type and round lettering.
+   Applied by <html class="brand-eyeful"> on the game page and by .brand-eyeful on the hub card. */
+html.brand-eyeful,.brand-eyeful{
+  color-scheme:light;
+  --bg:#fbf3e4; --bg2:#f1e3c9; --bg-glow:#fffaf0;
+  --text:#2b2118; --muted:#7a6a58;
+  --well:rgba(43,33,24,.08); --soft:rgba(43,33,24,.06); --line:rgba(43,33,24,.18);
+  --surface:#1f6f78; --surface-hi:#2a8590; --surface-edge:#17545b;
+  --tile:#ffffff; --tile-hi:#ffffff; --tile-shade:#efe4d2;
+  --paper:#fffdf8; --ink:#2b2118; --ink-soft:#4d4034; --ink-faint:#9a8a78;
+  --accent:#e8553e; --accent-ink:#ffffff; --accent-edge:#b23b27; --accent-soft:#f6b3a5;
+  --warn:#d6342c;
+  /* jewel tones for the kaleidoscope and title */
+  --j1:#e8553e; --j2:#f2b134; --j3:#2a9d8f; --j4:#7b5ea7; --j5:#3a86c8;
+  --font:"Avenir Next","Segoe UI","Helvetica Neue",Arial,sans-serif;
+  --font-display:"Rockwell","Roboto Slab","Museo Slab","Georgia",serif;
+  --display-weight:700; --display-case:none; --display-spacing:0;
+  --r-lg:16px; --r-md:12px; --r-sm:9px; --r-tile:50%;
+  --lift:0 10px 24px rgba(43,33,24,.16);
+}

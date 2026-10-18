@@ -1,0 +1,9 @@
+/* Hub card art for this game (loaded by the Parlor hub with brand.css). */
+/* No Echo: three clue notes, two of them cancelled for matching */
+.art.notes{gap:14px}
+.art.notes span{width:84px;height:66px;display:flex;align-items:center;justify-content:center;font-family:var(--font-hand);font-size:22px;color:var(--ink);border-radius:2px 2px 12px 2px;box-shadow:0 6px 10px rgba(0,0,0,.35)}
+.art.notes span:nth-child(1){background:var(--note-1);transform:rotate(-4deg)}
+.art.notes span:nth-child(2){background:var(--note-3);transform:rotate(3deg)}
+.art.notes span:nth-child(3){background:var(--note-2);transform:rotate(-2deg)}
+.art.notes s{text-decoration:none;position:relative;opacity:.6}
+.art.notes s::after{content:"";position:absolute;left:-12%;right:-12%;top:50%;height:4px;border-radius:4px;background:var(--accent);transform:rotate(-8deg)}

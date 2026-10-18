@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" class="brand-no-echo">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#2a1745">
+<title>No Echo</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../icons/no-echo-180.png">
+<link rel="icon" href="../icons/no-echo-180.png">
+<link rel="stylesheet" href="../shared/theme.css">
+<link rel="stylesheet" href="brand.css">
+<style>
+/* ---------- Setup ---------- */
+.title{display:flex;flex-direction:column;align-items:center;gap:6px}
+.title h1{margin:0;font-family:var(--font-hand);font-size:min(19vw,112px);line-height:1;color:var(--tile);transform:rotate(-3deg);text-shadow:0 4px 0 rgba(0,0,0,.25)}
+.echoes{display:flex;flex-direction:column;align-items:center;font-family:var(--font-hand);line-height:1.05;margin-top:-6px}
+.echoes span{position:relative;color:var(--muted)}
+.echoes span:nth-child(1){font-size:40px;opacity:.75} .echoes span:nth-child(2){font-size:30px;opacity:.5} .echoes span:nth-child(3){font-size:22px;opacity:.3}
+.echoes span::after{content:"";position:absolute;left:-8%;right:-8%;top:52%;height:.12em;background:var(--accent);border-radius:9px;transform:rotate(-4deg);opacity:.9}
+.controls .label{margin-bottom:-12px}
+.setup .seg button{padding:12px 14px}
+
+/* ---------- Game screens ---------- */
+.game{flex:1;width:100%;min-height:0;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:8px 16px 28px}
+.screen{width:min(720px,100%);margin:auto 0;display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center}
+.screen h2{margin:0;font-family:var(--font-display);font-size:min(9vw,44px);line-height:1.1}
+.screen h2 em{font-style:normal;color:var(--tile)}
+.screen p{margin:0;color:var(--muted);font-size:18px;line-height:1.45;max-width:560px}
+.screen .primary{margin-top:4px;min-width:min(380px,100%)}
+.status{font-family:var(--font-display);color:var(--muted);font-size:17px;white-space:nowrap}
+.status b{color:var(--text)}
+
+/* sticky notes */
+.notes{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;width:100%}
+.note-card{position:relative;min-width:132px;max-width:240px;min-height:110px;padding:18px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  background:var(--nc,var(--note-1));color:var(--ink);border:0;border-radius:3px 3px 18px 3px;font-family:var(--font-hand);font-size:30px;line-height:1.1;word-break:break-word;
+  box-shadow:0 10px 18px rgba(0,0,0,.35),inset 0 -10px 18px rgba(0,0,0,.05)}
+.note-card:nth-child(6n+1){--nc:var(--note-1);transform:rotate(-2deg)} .note-card:nth-child(6n+2){--nc:var(--note-2);transform:rotate(1.5deg)}
+.note-card:nth-child(6n+3){--nc:var(--note-3);transform:rotate(-1deg)} .note-card:nth-child(6n+4){--nc:var(--note-4);transform:rotate(2deg)}
+.note-card:nth-child(6n+5){--nc:var(--note-5);transform:rotate(-1.5deg)} .note-card:nth-child(6n+6){--nc:var(--note-6);transform:rotate(1deg)}
+.note-card small{font-family:var(--font);font-size:13px;color:var(--ink-soft)}
+.note-card.out{filter:saturate(.3);opacity:.85}
+.note-card.out .w{position:relative}
+.note-card.out .w::after{content:"";position:absolute;left:-10%;right:-10%;top:50%;height:.14em;background:var(--accent);border-radius:9px;transform:rotate(-6deg)}
+.note-card .why{font-family:var(--font);font-size:12px;font-weight:700;color:var(--accent-edge);text-transform:uppercase;letter-spacing:.04em}
+button.note-card{cursor:pointer}
+/* the five face-down words to pick from */
+.pick .note-card{min-width:100px;min-height:100px;font-size:52px}
+.big-word{font-family:var(--font-hand);font-size:min(16vw,92px);line-height:1;padding:28px 40px;min-width:min(420px,90%);background:var(--tile);color:var(--ink);border-radius:4px 4px 26px 4px;transform:rotate(-1.5deg);box-shadow:var(--lift)}
+.peek{border:2px dashed var(--line);background:var(--soft);border-radius:var(--r-lg);padding:30px 26px;min-width:min(420px,90%);font-size:20px;color:var(--text)}
+.mystery{font-size:17px;color:var(--muted)} .mystery b{font-family:var(--font-hand);font-size:24px;color:var(--tile);font-weight:400;letter-spacing:.02em}
+.secret{width:min(420px,100%);text-align:center;font-size:24px;-webkit-text-security:disc}
+.secret.show{-webkit-text-security:none}
+.entry{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%}
+.entry .row2{display:flex;gap:10px;width:min(420px,100%)}
+.entry .row2 .field{flex:1}
+.who{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.who span{padding:6px 12px;border-radius:999px;background:var(--well);color:var(--muted);font-size:15px}
+.who span.done{background:var(--good);color:#10301f;font-weight:700}
+.who span.now{background:var(--tile);color:var(--ink);font-weight:700}
+.btns{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
+.btns .ghost{min-width:130px}
+.verdict{font-family:var(--font-display);font-size:min(13vw,64px);line-height:1}
+.verdict.good{color:var(--good)} .verdict.bad{color:var(--bad)} .verdict.meh{color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="bar">
+    <div class="left">
+      <a class="home" id="homeLink" href="../">‹ Games</a>
+      <nav class="tabs" id="tabs" role="tablist" hidden>
+        <button role="tab" data-tab="settings" aria-selected="true">Settings</button>
+        <button role="tab" data-tab="game" aria-selected="false">Game</button>
+      </nav>
+    </div>
+    <div class="center"><span class="status" id="status"></span></div>
+    <div class="right"></div>
+  </header>
+
+  <main class="setup" id="setup">
+    <div class="title">
+      <h1>No Echo</h1>
+      <div class="echoes" aria-hidden="true"><span>echo</span><span>echo</span><span>echo</span></div>
+    </div>
+    <section class="controls">
+      <div class="label">Players (3 or more)</div>
+      <div class="names" id="names"></div>
+      <button class="ghost" id="addPlayer">Add player</button>
+      <div class="row">
+        <span>Clues</span>
+        <div class="seg" id="segMode">
+          <button data-v="device">Typed here</button>
+          <button data-v="paper">On paper</button>
+        </div>
+      </div>
+      <div class="row">
+        <span>Cards</span>
+        <div class="stepper">
+          <button id="minus" aria-label="Fewer cards">−</button>
+          <output id="cardsOut">13</output>
+          <button id="plus" aria-label="More cards">+</button>
+        </div>
+      </div>
+      <button class="primary" id="start">Start a game</button>
+      <p class="note" id="savedNote" hidden></p>
+    </section>
+    <p class="credit">Everyone works together. Each round one player guesses a mystery word they can't see; everyone else writes a one-word clue. Matching clues cancel each other out, so be helpful, but be original. With clues typed here, pass the device around and they stay hidden as you type.</p>
+  </main>
+
+  <div class="game" id="gameView" hidden>
+    <!-- 1. guesser picks a number blind -->
+    <section class="screen" data-phase="pick">
+      <h2><em class="g"></em>, you're guessing.</h2>
+      <p>Pick a number. The five words are on the other side, so you won't see them.</p>
+      <div class="notes pick" id="pickNotes"></div>
+    </section>
+    <!-- 2. guesser looks away, the others see the word -->
+    <section class="screen" data-phase="hide">
+      <h2><em class="g"></em>, look away!</h2>
+      <button class="peek" id="peekBtn">Clue-givers: tap to see the mystery word</button>
+      <div class="big-word" id="bigWord" hidden></div>
+      <p id="hideText"></p>
+      <button class="primary" id="toCluesBtn" hidden>Write clues</button>
+    </section>
+    <!-- 3. clues typed one by one on this device -->
+    <section class="screen" data-phase="clues">
+      <div class="mystery">Mystery word: <b class="word"></b></div>
+      <h2><em id="giverName"></em>, your clue</h2>
+      <p>One word. The others shouldn't see it; it's hidden as you type.</p>
+      <form class="entry" id="clueForm" autocomplete="off">
+        <div class="row2">
+          <input class="field secret" id="clueInput" maxlength="24" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Your clue">
+          <button type="button" class="ghost" id="showClue">Show</button>
+        </div>
+        <button class="primary" type="submit">Done, pass it on</button>
+      </form>
+      <div class="who" id="whoList"></div>
+    </section>
+    <!-- 4. clue-givers compare and cancel -->
+    <section class="screen" data-phase="compare">
+      <div class="mystery">Mystery word: <b class="word"></b> · <em class="g"></em> keeps looking away</div>
+      <h2>Compare your clues</h2>
+      <p>Matching clues cancel each other out, and so do clues too close to the word. Tap a note to cross it out or bring it back.</p>
+      <div class="notes" id="compareNotes"></div>
+      <button class="primary" id="toGuessBtn">Show <span class="g"></span> the clues</button>
+    </section>
+    <!-- 5. guesser sees what's left and guesses -->
+    <section class="screen" data-phase="guess">
+      <h2><em class="g"></em>, you can look now.</h2>
+      <p id="guessText"></p>
+      <div class="notes" id="guessNotes"></div>
+      <form class="entry" id="guessForm" autocomplete="off">
+        <input class="field" id="guessInput" maxlength="30" placeholder="Your guess" autocapitalize="off" autocorrect="off" spellcheck="false" style="width:min(420px,100%);text-align:center;font-size:24px">
+        <div class="btns"><button class="primary" type="submit" style="min-width:0;padding:16px 34px">Guess</button><button type="button" class="ghost" id="passBtn">Pass</button></div>
+      </form>
+      <div class="btns" id="judgeBtns">
+        <button class="ghost strong" data-r="right">Got it</button>
+        <button class="ghost" data-r="wrong">Wrong guess</button>
+        <button class="ghost" data-r="pass">Pass</button>
+      </div>
+    </section>
+    <!-- 6. result -->
+    <section class="screen" data-phase="result">
+      <div class="verdict" id="verdict"></div>
+      <div class="big-word" id="resultWord"></div>
+      <p id="resultText"></p>
+      <div class="btns">
+        <button class="primary" id="nextBtn">Next card</button>
+      </div>
+      <button class="ghost" id="overrideBtn" hidden>That's close enough: count it</button>
+    </section>
+    <!-- 7. game over -->
+    <section class="screen" data-phase="over">
+      <h2>That's the whole deck!</h2>
+      <p>Tally up your cards and go again.</p>
+      <button class="primary" id="againBtn">Play again</button>
+    </section>
+  </div>
+</div>
+
+<script src="../shared/core.js"></script>
+<script src="../shared/words/nouns.js"></script>
+<script src="no-echo.js"></script>
+</body>
+</html>

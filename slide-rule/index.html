@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" class="brand-slide-rule">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#e8ebe3">
+<title>Slide Rule</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../icons/slide-rule-180.png">
+<link rel="icon" href="../icons/slide-rule-180.png">
+<link rel="stylesheet" href="../shared/theme.css">
+<link rel="stylesheet" href="brand.css">
+<style>
+/* graph paper under everything */
+body{background-color:var(--bg);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px),
+    radial-gradient(ellipse at 50% 40%,var(--bg-glow) 0%,var(--bg) 60%,var(--bg2) 100%);
+  background-size:24px 24px,24px 24px,100% 100%}
+
+/* ---------- Setup ---------- */
+.plate{display:flex;flex-direction:column;align-items:center;gap:14px}
+.plate h1{margin:0;font-size:min(17vw,104px);line-height:.9;color:var(--surface)}
+.ruler{position:relative;width:min(420px,80vw);height:30px;border:2px solid var(--wall);border-radius:var(--r-sm);
+  background:repeating-linear-gradient(90deg,var(--wall) 0 1.5px,transparent 1.5px 10.5px) bottom/100% 9px no-repeat,
+             repeating-linear-gradient(90deg,var(--wall) 0 2px,transparent 2px 52.5px) bottom/100% 16px no-repeat,var(--paper)}
+.ruler .bot{position:absolute;top:-34px;left:62%;width:30px;height:30px}
+.ruler .bot::after{content:"";position:absolute;right:100%;top:30%;width:70px;height:12px;margin-right:6px;
+  background:repeating-linear-gradient(180deg,var(--accent) 0 2px,transparent 2px 5px);opacity:.7}
+
+/* ---------- Play layout: board plus a side panel (below it on tall screens) ---------- */
+:root{ --board:min(94vw, calc(100vh - 360px), 860px); }
+@supports (height:100dvh){ :root{ --board:min(94vw, calc(100dvh - 360px), 860px); } }
+.play{flex:1;width:100%;min-height:0;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:14px;padding:0 12px 20px}
+@media (min-aspect-ratio:1/1) and (min-width:700px){
+  :root{ --board:min(calc(100vw - 360px), calc(100vh - 110px), 860px); }
+  @supports (height:100dvh){ :root{ --board:min(calc(100vw - 360px), calc(100dvh - 110px), 860px); } }
+  .play{flex-direction:row;align-items:flex-start;justify-content:center;overflow:hidden}
+}
+@media (max-height:520px) and (min-aspect-ratio:1/1){ .play{overflow-y:auto} }
+
+/* ---------- Board ---------- */
+.board{width:var(--board);padding:calc(var(--board)*.018);border-radius:var(--r-lg);flex:none}
+.grid{position:relative;width:100%;aspect-ratio:1;touch-action:none;cursor:pointer}
+.grid svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.bot{position:absolute;left:0;top:0;width:6.25%;height:6.25%;padding:.6%;pointer-events:none;transition:transform .25s cubic-bezier(.3,.7,.4,1)}
+.bot i{display:block;width:100%;height:100%;border-radius:var(--r-tile);
+  background:radial-gradient(circle at 34% 42%,#fff 0 9%,var(--wall) 9.5% 15%,transparent 15.5%),
+             radial-gradient(circle at 66% 42%,#fff 0 9%,var(--wall) 9.5% 15%,transparent 15.5%),var(--c);
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,.22),inset 0 2px 0 rgba(255,255,255,.45),0 2px 4px rgba(0,0,0,.35)}
+.bot.c0{--c:var(--bot-red)} .bot.c1{--c:var(--bot-green)} .bot.c2{--c:var(--bot-blue)} .bot.c3{--c:var(--bot-yellow)}
+.bot.sel i{outline:3px solid var(--accent);outline-offset:2px}
+.hintArrow{position:absolute;left:0;top:0;width:6.25%;height:6.25%;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.hintArrow b{width:62%;height:62%;border-radius:50%;background:var(--accent);color:#fff;font-size:calc(var(--board)*.022);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 4px rgba(0,0,0,.3)}
+
+/* ---------- Side panel ---------- */
+.panel{width:min(var(--board),100%);display:flex;flex-direction:column;gap:12px}
+@media (min-aspect-ratio:1/1) and (min-width:700px){ .panel{width:300px;flex:none;max-height:calc(100dvh - 100px);overflow-y:auto} }
+.box{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--lift)}
+.trow{display:flex;align-items:center;gap:14px}
+.chipbig{width:64px;height:64px;flex:none;border-radius:var(--r-md);background:var(--surface);display:flex;align-items:center;justify-content:center}
+.chipbig svg{width:44px;height:44px}
+.tname{font-family:var(--font-display);font-weight:700;font-size:24px;text-transform:uppercase;letter-spacing:.04em;line-height:1.1}
+#clock{font-family:var(--font-display);font-weight:700;font-size:54px;line-height:1;text-align:center;font-variant-numeric:tabular-nums;color:var(--surface)}
+#clock.warn{color:var(--accent)} #clock.crit{color:var(--warn)}
+.panel .primary{margin-top:0;font-size:20px;padding:14px;min-height:54px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:.06em}
+.phaseText{margin:0;color:var(--ink-soft);font-size:15px;line-height:1.4}
+.moves{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.moves .n{font-family:var(--font-display);font-weight:700;font-size:28px}
+.solveText{margin:0;font-size:15px;color:var(--ink-soft)}
+.ghost.small{min-height:40px;padding:6px 12px;font-size:15px}
+
+@media (prefers-reduced-motion:reduce){.bot{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="bar">
+    <div class="left">
+      <a class="home" id="homeLink" href="../">‹ Games</a>
+      <nav class="tabs" id="tabs" role="tablist" hidden>
+        <button role="tab" data-tab="settings" aria-selected="true">Settings</button>
+        <button role="tab" data-tab="board" aria-selected="false">Board</button>
+      </nav>
+    </div>
+    <div class="center"></div>
+    <div class="right"><button class="ghost strong" id="againBtn" hidden>New board</button></div>
+  </header>
+
+  <main class="setup" id="setup">
+    <div class="plate">
+      <h1 class="display">Slide Rule</h1>
+      <div class="ruler" aria-hidden="true"><span class="bot c0" style="padding:0"><i></i></span></div>
+    </div>
+    <section class="controls">
+      <div class="row">
+        <span>Timer after the first call</span>
+        <div class="stepper">
+          <button id="minus" aria-label="Shorter">−</button>
+          <output id="timeOut">1:00</output>
+          <button id="plus" aria-label="Longer">+</button>
+        </div>
+      </div>
+      <button class="primary" id="start">Draw a new board</button>
+      <p class="note" id="savedNote" hidden></p>
+    </section>
+    <p class="credit">Robots slide until they hit a wall or another robot. Each round a target is drawn: race to find the fewest moves that get the matching robot there. The first player to call a number starts the timer; lowest call shows their route. The star-burst target takes any robot. Tap a robot, then tap where it should go, or swipe.</p>
+  </main>
+
+  <div class="play" id="boardView" hidden>
+    <div class="board surface"><div class="grid" id="grid" role="application" aria-label="Board">
+      <svg id="svg" viewBox="0 0 16 16" aria-hidden="true"></svg>
+      <div id="bots"></div>
+    </div></div>
+    <aside class="panel">
+      <div class="box">
+        <div class="trow">
+          <div class="chipbig"><svg id="chip" viewBox="0 0 1 1"></svg></div>
+          <div><div class="label" id="targetNum"></div><div class="tname" id="targetName"></div></div>
+        </div>
+      </div>
+      <div class="box" id="phaseBox">
+        <div id="clock"></div>
+        <button class="primary" id="timerBtn">Start timer</button>
+        <p class="phaseText" id="phaseText"></p>
+        <div class="moves"><span class="n" id="moveCount"></span><button class="ghost small" id="resetBtn">Reset robots</button></div>
+      </div>
+      <div class="box">
+        <button class="ghost" id="nextBtn">Next target</button>
+      </div>
+      <div class="box">
+        <button class="ghost small" id="solveBtn">Show the shortest route</button>
+        <p class="solveText" id="solveText" hidden></p>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script src="../shared/core.js"></script>
+<script src="slide-rule.js"></script>
+</body>
+</html>

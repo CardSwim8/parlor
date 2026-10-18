@@ -1,0 +1,22 @@
+/* Slide Rule brand: a drafting table. Graph-paper room, vellum board framed in blueprint blue,
+   navy ink walls, safety-orange accents, condensed engineering lettering.
+   Applied by <html class="brand-slide-rule"> on the game page and by .brand-slide-rule on the hub card. */
+html.brand-slide-rule,.brand-slide-rule{
+  color-scheme:light;
+  --bg:#e8ebe3; --bg2:#dde1d7; --bg-glow:#f3f5ef;
+  --text:#1b2a3a; --muted:#5d6b78;
+  --well:rgba(27,42,58,.08); --soft:rgba(27,42,58,.06); --line:rgba(27,42,58,.22);
+  --surface:#1f4e8c; --surface-hi:#2a62a8; --surface-edge:#163a6a;
+  --tile:#ffffff; --tile-hi:#ffffff; --tile-shade:#e3e7eb;
+  --paper:#fbfaf5; --ink:#1b2a3a; --ink-soft:#3c4b5a; --ink-faint:#8a96a2;
+  --accent:#f26a1b; --accent-ink:#ffffff; --accent-edge:#b84a0c; --accent-soft:#f9b48a;
+  --warn:#d93a2b;
+  /* the board */
+  --vellum:#f8f6ef; --grid:rgba(31,78,140,.14); --wall:#14243a;
+  --bot-red:#e0412f; --bot-green:#2c9a4f; --bot-blue:#2a6ad8; --bot-yellow:#f0b81c;
+  --font:"Avenir Next","Segoe UI","Helvetica Neue",Arial,sans-serif;
+  --font-display:"DIN Condensed","DIN Alternate","Bahnschrift","Avenir Next Condensed","Arial Narrow",sans-serif;
+  --display-weight:700; --display-case:uppercase; --display-spacing:.06em;
+  --r-lg:8px; --r-md:6px; --r-sm:4px; --r-tile:22%;
+  --lift:0 8px 22px rgba(27,42,58,.18);
+}

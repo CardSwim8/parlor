@@ -1,0 +1,7 @@
+/* Hub card art for this game (loaded by the Parlor hub with brand.css). */
+/* Ringmaster: two striped drums with animals stacked on top */
+.art.ring{gap:44px;align-items:flex-end;padding-bottom:12px}
+.art.ring .pod{display:flex;flex-direction:column;align-items:center}
+.art.ring .pod span{font-size:28px;line-height:1.05}
+.art.ring .drum{width:62px;height:24px;border-radius:50%/30%;background:repeating-linear-gradient(90deg,var(--c) 0 8px,var(--stripe) 8px 13px);box-shadow:inset 0 -5px 0 rgba(0,0,0,.25)}
+.art.ring .L{--c:var(--left)} .art.ring .R{--c:var(--right)}

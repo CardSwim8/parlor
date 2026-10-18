@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" class="brand-triad">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f2ede4">
+<title>Triad</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../icons/triad-180.png">
+<link rel="icon" href="../icons/triad-180.png">
+<link rel="stylesheet" href="../shared/theme.css">
+<link rel="stylesheet" href="brand.css">
+<style>
+/* ---------- Setup: a Bauhaus poster ---------- */
+.poster{display:flex;flex-direction:column;align-items:center;gap:18px}
+.poster .shapes{display:flex;align-items:flex-end;gap:14px}
+.poster .shapes i{display:block;width:min(15vw,78px);height:min(15vw,78px)}
+.poster .shapes .c{border-radius:50%;background:var(--c1)}
+.poster .shapes .t{background:var(--c2);clip-path:polygon(50% 0,100% 100%,0 100%)}
+.poster .shapes .s{background:var(--c3)}
+.poster h1{margin:0;font-family:var(--font-display);font-weight:700;font-size:min(16vw,96px);letter-spacing:.24em;line-height:1;margin-right:-.24em}
+.rule{font-size:16px;color:var(--ink-soft);line-height:1.45;margin:0}
+
+/* ---------- Table: the whole screen under the bar ---------- */
+:root{ --cols:3; --rows:4; --bw:min(94vw, calc((100vh - 120px) / var(--rows) * var(--cols) * 1.5), 1300px); }
+@supports (height:100dvh){ :root{ --bw:min(94vw, calc((100dvh - 120px) / var(--rows) * var(--cols) * 1.5), 1300px); } }
+.play{flex:1;width:100%;min-height:0;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:0 12px 16px}
+.table{position:relative;width:var(--bw);flex:none;padding:calc(var(--bw) * .02);border-radius:var(--r-lg)}
+.grid{display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:calc(var(--bw) * .018)}
+.card{position:relative;aspect-ratio:1.5;border:0;padding:0;border-radius:var(--r-md);background:var(--paper);
+  box-shadow:0 3px 0 var(--tile-shade),0 6px 12px rgba(0,0,0,.35);transition:transform .12s, box-shadow .12s}
+.card svg{width:100%;height:100%;display:block}
+.card.sel{transform:translateY(-4px);box-shadow:0 0 0 4px var(--c3),0 10px 16px rgba(0,0,0,.4)}
+.card.good{box-shadow:0 0 0 5px var(--good),0 10px 16px rgba(0,0,0,.4)}
+.card.bad{animation:shake .35s}
+.card.new{animation:deal .35s ease-out}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+@keyframes deal{from{transform:scale(.6) rotate(-6deg);opacity:0}to{transform:none;opacity:1}}
+.cover{position:absolute;inset:0;border-radius:inherit;background:rgba(35,35,37,.95);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:20px}
+.cover .who{font-family:var(--font-display);font-weight:700;font-size:min(8vw,46px);letter-spacing:.12em;text-transform:uppercase}
+.cover .primary{margin:0;min-width:240px;font-family:var(--font-display);letter-spacing:.14em;text-transform:uppercase}
+.cover p{margin:0;opacity:.85;font-size:17px}
+.cover .award{width:min(360px,100%)}
+.table.grace{box-shadow:0 0 0 5px var(--warn)}
+
+/* the hand-over flash: a full-screen sweep of colour with the next player's name */
+.flash{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;pointer-events:none;
+  background:var(--fc);color:#fff;font-family:var(--font-display);font-weight:700;font-size:min(14vw,110px);letter-spacing:.12em;text-transform:uppercase;text-align:center;padding:20px;
+  animation:flash .9s ease-out forwards}
+.flash small{display:block;font-size:.28em;letter-spacing:.2em;opacity:.9;margin-bottom:.2em}
+@keyframes flash{0%{opacity:0;transform:scale(1.06)}12%{opacity:.88;transform:none}55%{opacity:.88}100%{opacity:0}}
+
+/* ---------- Whose turn: in the top bar ---------- */
+.turn{display:flex;align-items:center;gap:14px}
+.turnname{font-family:var(--font-display);font-weight:700;font-size:26px;letter-spacing:.1em;text-transform:uppercase;max-width:40vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#clock{font-family:var(--font-display);font-weight:700;font-size:34px;font-variant-numeric:tabular-nums;border:0;background:none;padding:0;color:var(--ink);min-width:3.2ch}
+#clock.warn{color:var(--c3)} #clock.crit{color:var(--warn)}
+@media (max-width:560px){
+  /* not enough room for tabs, name, clock and pause in one row: name and clock drop to a second row */
+  .bar .center{grid-column:1/-1;grid-row:2}
+  .turnname{font-size:20px;max-width:60vw} #clock{font-size:28px}
+  #pauseBtn{font-size:0;padding:8px 12px;min-width:44px} #pauseBtn::before{content:"";display:inline-block;width:11px;height:14px;box-sizing:border-box;border-left:4px solid currentColor;border-right:4px solid currentColor}
+}
+@media (prefers-reduced-motion:reduce){ .flash{animation-duration:1.4s} .card.new,.card.bad{animation:none} }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="bar">
+    <div class="left">
+      <a class="home" id="homeLink" href="../">‹ Games</a>
+      <nav class="tabs" id="tabs" role="tablist" hidden>
+        <button role="tab" data-tab="settings" aria-selected="true">Settings</button>
+        <button role="tab" data-tab="game" aria-selected="false">Table</button>
+      </nav>
+    </div>
+    <div class="center"><div class="turn" id="turnBar" hidden><span class="turnname" id="turnName"></span><button id="clock" aria-live="off"></button></div></div>
+    <div class="right"><button class="ghost" id="pauseBtn" aria-label="Pause" hidden>Pause</button><button class="ghost strong" id="againBtn" hidden>New game</button></div>
+  </header>
+
+  <main class="setup" id="setup">
+    <div class="poster">
+      <div class="shapes" aria-hidden="true"><i class="c"></i><i class="t"></i><i class="s"></i></div>
+      <h1>Triad</h1>
+    </div>
+    <section class="controls">
+      <div class="label">Players</div>
+      <div class="names" id="names"></div>
+      <button class="ghost" id="addPlayer">Add player</button>
+      <div class="row">
+        <span>Time per turn</span>
+        <div class="stepper"><button id="minus" aria-label="Shorter">−</button><output id="timeOut">0:30</output><button id="plus" aria-label="Longer">+</button></div>
+      </div>
+      <button class="primary" id="start">Deal the cards</button>
+      <p class="note" id="savedNote" hidden></p>
+      <p class="rule">Every card has a count, a shape, a shading and a colour. Three cards make a triad when, for each of those four, the cards are either all the same or all different. Take turns: find a triad before your clock runs out, and the next player's clock starts straight away.</p>
+    </section>
+  </main>
+
+  <div class="play" id="gameView" hidden>
+    <div class="table surface" id="table">
+      <div class="grid" id="grid"></div>
+      <div class="cover" id="cover" hidden></div>
+    </div>
+  </div>
+</div>
+
+<script src="../shared/core.js"></script>
+<script src="triad.js"></script>
+</body>
+</html>

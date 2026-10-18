@@ -1,0 +1,18 @@
+/* Tumbleword brand: a toy-box dice tray. Navy felt, cream dice, sunny amber, round geometric type.
+   Applied by <html class="brand-tumbleword"> on the game page and by .brand-tumbleword on the hub card. */
+html.brand-tumbleword,.brand-tumbleword{
+  color-scheme:dark;
+  --bg:#13213f; --bg2:#0e1931; --bg-glow:#1b2d55;
+  --text:#e9edf7; --muted:#9fb0d6;
+  --well:rgba(0,0,0,.28); --soft:rgba(255,255,255,.08); --line:rgba(233,237,247,.25);
+  --surface:#2a4c9b; --surface-hi:#3560b8; --surface-edge:#1c3678;
+  --tile:#f4efe1; --tile-hi:#fffdf6; --tile-shade:#d9d1bb;
+  --paper:#fbf8ef; --ink:#1d1a16; --ink-soft:#3a352c; --ink-faint:#8d8676;
+  --accent:#ffc23d; --accent-ink:#2a1d00; --accent-edge:#b9851a; --accent-soft:#ffd772;
+  --warn:#ff6b57;
+  --font:"Futura","Avenir Next","Trebuchet MS","Helvetica Neue",Arial,sans-serif;
+  --font-display:"Futura","Avenir Next","Trebuchet MS","Helvetica Neue",Arial,sans-serif;
+  --display-weight:700; --display-case:none; --display-spacing:.02em;
+  --r-lg:16px; --r-md:14px; --r-sm:10px; --r-tile:16%;
+  --lift:0 10px 26px rgba(0,0,0,.35);
+}

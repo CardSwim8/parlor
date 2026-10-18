@@ -1,0 +1,7 @@
+/* Hub card art for this game (loaded by the Parlor hub with brand.css). */
+/* Cover Story: a spread of case cards on the desk blotter, one stamped */
+.art.cards{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:1fr 1fr;gap:8px;align-items:stretch}
+.art.cards span{border-radius:var(--r-tile);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:12px;letter-spacing:.06em;color:var(--ink);box-shadow:0 2px 3px rgba(0,0,0,.35)}
+.art.cards .tile{box-shadow:0 2px 3px rgba(0,0,0,.35)}
+.art.cards .a{background:var(--team-a);color:#fff} .art.cards .b{background:var(--team-b);color:#fff}
+.art.cards .x{background:var(--assassin);color:var(--tile)}

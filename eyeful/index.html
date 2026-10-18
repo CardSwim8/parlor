@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" class="brand-eyeful">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#fbf3e4">
+<title>Eyeful</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../icons/eyeful-180.png">
+<link rel="icon" href="../icons/eyeful-180.png">
+<link rel="stylesheet" href="../shared/theme.css">
+<link rel="stylesheet" href="brand.css">
+<style>
+/* ---------- Setup: title letters on jewel-tone circles ---------- */
+.title-tiles .tile{color:#fff;background:var(--c);box-shadow:inset 0 -5px 0 rgba(0,0,0,.18),inset 0 3px 0 rgba(255,255,255,.3),0 6px 10px rgba(43,33,24,.25)}
+.title-tiles .tile:nth-child(1){--c:var(--j1)} .title-tiles .tile:nth-child(2){--c:var(--j2)} .title-tiles .tile:nth-child(3){--c:var(--j3)}
+.title-tiles .tile:nth-child(4){--c:var(--j4)} .title-tiles .tile:nth-child(5){--c:var(--j5)} .title-tiles .tile:nth-child(6){--c:var(--j1)}
+.tagline{margin:-22px 0 0;color:var(--muted);font-size:18px;text-align:center}
+
+/* ---------- Play ---------- */
+:root{ --scene-w:min(calc(100vw - 32px), calc((100vh - 200px) * 1.6), 1200px); }
+@supports (height:100dvh){ :root{ --scene-w:min(calc(100vw - 32px), calc((100dvh - 200px) * 1.6), 1200px); } }
+.play{flex:1;width:100%;min-height:0;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:14px;padding:0 16px 28px}
+.controlbar{width:var(--scene-w);display:flex;align-items:center;gap:14px;flex-wrap:wrap;min-height:64px}
+.letter{width:64px;height:64px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;background:var(--accent);color:#fff;
+  font-family:var(--font-display);font-weight:700;font-size:40px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18),0 6px 12px rgba(43,33,24,.25)}
+.letter.empty{background:var(--well);color:var(--muted);box-shadow:none}
+.letter.spin{animation:spin .6s cubic-bezier(.3,.7,.3,1)}
+@keyframes spin{from{transform:rotate(-200deg) scale(.4)}to{transform:none}}
+.ctext{flex:1;min-width:150px}
+.ctext b{display:block;font-family:var(--font-display);font-size:22px}
+.ctext span{color:var(--muted);font-size:15px}
+#clock{font-family:var(--font-display);font-weight:700;font-size:44px;font-variant-numeric:tabular-nums;border:0;background:none;padding:0 6px;color:var(--surface)}
+#clock.warn{color:var(--j2)} #clock.crit{color:var(--warn)}
+.controlbar .primary{margin:0;padding:12px 22px;min-height:52px;font-size:19px;font-family:var(--font-display)}
+.frame{width:var(--scene-w);padding:10px;border-radius:var(--r-lg)}
+.scene{position:relative;width:100%;aspect-ratio:16/10;border-radius:var(--r-md);overflow:hidden;background:var(--paper)}
+.scene svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.scene .cover{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:var(--surface-edge);color:#fff;font-family:var(--font-display);font-size:26px;text-align:center;padding:20px}
+.scene .cover small{font-family:var(--font);font-size:16px;opacity:.8}
+.scene text.o{transition:opacity .3s}
+.scene.revealed text.o{opacity:.22}
+.scene.revealed text.o.hit{opacity:1}
+.scene circle.ring{fill:none;stroke:var(--accent);stroke-width:5;opacity:0;transition:opacity .3s}
+.scene.revealed circle.ring{opacity:.95}
+
+/* ---------- Answers and scoring ---------- */
+.panel{width:var(--scene-w);display:flex;flex-direction:column;gap:14px}
+.box{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--lift)}
+.answers{display:flex;flex-wrap:wrap;gap:6px}
+.answers span{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:var(--well);font-size:16px}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="bar">
+    <div class="left">
+      <a class="home" id="homeLink" href="../">‹ Games</a>
+      <nav class="tabs" id="tabs" role="tablist" hidden>
+        <button role="tab" data-tab="settings" aria-selected="true">Settings</button>
+        <button role="tab" data-tab="game" aria-selected="false">Game</button>
+      </nav>
+    </div>
+    <div class="center"></div>
+    <div class="right"><button class="ghost" id="pauseBtn" hidden>Pause</button></div>
+  </header>
+
+  <main class="setup" id="setup">
+    <div class="title-tiles" aria-label="Eyeful">
+      <div class="tile">E</div><div class="tile">Y</div><div class="tile">E</div><div class="tile">F</div><div class="tile">U</div><div class="tile">L</div>
+    </div>
+    <p class="tagline">How many things can you spot?</p>
+    <section class="controls">
+      <div class="row">
+        <span>Rounds</span>
+        <div class="stepper"><button id="rMinus" aria-label="Fewer rounds">−</button><output id="roundsOut">8</output><button id="rPlus" aria-label="More rounds">+</button></div>
+      </div>
+      <div class="row">
+        <span>Time to look</span>
+        <div class="stepper"><button id="tMinus" aria-label="Shorter">−</button><output id="timeOut">2:00</output><button id="tPlus" aria-label="Longer">+</button></div>
+      </div>
+      <button class="primary" id="start">Start a game</button>
+      <p class="note" id="savedNote" hidden></p>
+    </section>
+    <p class="credit">Each round a new picture fills the screen and a letter is drawn. Everyone writes down as many things in the picture starting with that letter as they can before time runs out. Then read your lists aloud and see everything that was hiding there.</p>
+  </main>
+
+  <div class="play" id="gameView" hidden>
+    <div class="controlbar">
+      <div class="letter empty" id="letter">?</div>
+      <div class="ctext"><b id="roundText"></b><span id="phaseText"></span></div>
+      <button id="clock" aria-live="off"></button>
+      <button class="primary" id="actionBtn"></button>
+    </div>
+    <div class="frame surface">
+      <div class="scene" id="scene"><svg id="svg" viewBox="0 0 1600 1000" aria-hidden="true"></svg><div class="cover" id="cover"></div></div>
+    </div>
+    <div class="panel" id="panel">
+      <div class="box" id="answerBox">
+        <div class="label" id="answerLabel"></div>
+        <div class="answers" id="answers"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../shared/core.js"></script>
+<script src="objects.js"></script>
+<script src="eyeful.js"></script>
+</body>
+</html>

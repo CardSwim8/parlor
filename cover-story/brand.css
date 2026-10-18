@@ -1,0 +1,24 @@
+/* Cover Story brand: a field agent's desk. Charcoal room, green leather blotter, manila case files,
+   rubber-stamp red, typewriter headings, squared-off corners.
+   Applied by <html class="brand-cover-story"> on the game page and by .brand-cover-story on the hub card. */
+html.brand-cover-story,.brand-cover-story{
+  color-scheme:dark;
+  --bg:#191a17; --bg2:#10110e; --bg-glow:#272822;
+  --text:#ebe4d0; --muted:#a39c86;
+  --well:rgba(0,0,0,.35); --soft:rgba(255,255,255,.07); --line:rgba(235,228,208,.22);
+  --surface:#2c4636; --surface-hi:#375842; --surface-edge:#1d3024;
+  --tile:#e9d9ae; --tile-hi:#f4e9c9; --tile-shade:#cfba86;
+  --paper:#f6efdc; --ink:#2a2419; --ink-soft:#4a4130; --ink-faint:#8a7d60;
+  --accent:#b8322a; --accent-ink:#fbf3e6; --accent-edge:#7c1f19; --accent-soft:#e2948d;
+  --warn:#e0533f;
+  --team-a:#c23b30; --team-a-hi:#de6a5e; --team-a-edge:#8a271f;
+  --team-b:#2f62ad; --team-b-hi:#5d8ad0; --team-b-edge:#1f417a;
+  --agent:#3d7f4b; --agent-hi:#65a571; --agent-edge:#285a33;
+  --neutral:#c9b98f; --neutral-hi:#ddd0ad; --neutral-edge:#a8976b;
+  --assassin:#26231f; --assassin-hi:#4a443c; --assassin-edge:#0d0c0b;
+  --font:"Avenir Next Condensed","Avenir Next","Arial Narrow","Helvetica Neue",Arial,sans-serif;
+  --font-display:"American Typewriter","Courier Prime","Courier New",Courier,monospace;
+  --display-weight:700; --display-case:uppercase; --display-spacing:.08em;
+  --r-lg:6px; --r-md:5px; --r-sm:3px; --r-tile:4px;
+  --lift:0 10px 26px rgba(0,0,0,.45);
+}

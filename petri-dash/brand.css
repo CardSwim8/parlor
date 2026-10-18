@@ -1,0 +1,24 @@
+/* Petri Dash brand: a lab after hours. Dark blue-green glass, glowing microbes, biohazard yellow,
+   monospace instrument labels, everything round like a petri dish.
+   Applied by <html class="brand-petri-dash"> on the game page and by .brand-petri-dash on the hub card. */
+html.brand-petri-dash,.brand-petri-dash{
+  color-scheme:dark;
+  --bg:#0d1b22; --bg2:#08131a; --bg-glow:#143a44;
+  --text:#e6f6f4; --muted:#8fb3b0;
+  --well:rgba(0,0,0,.3); --soft:rgba(255,255,255,.08); --line:rgba(230,246,244,.2);
+  --surface:#143039; --surface-hi:#1b3e49; --surface-edge:#0c2027;
+  --tile:#e6f6f4; --tile-hi:#ffffff; --tile-shade:#bcd8d4;
+  --paper:#eef8f6; --ink:#0d1b22; --ink-soft:#2c4a50; --ink-faint:#6f8f92;
+  --accent:#ffd23f; --accent-ink:#1b1600; --accent-edge:#b8921a; --accent-soft:#ffe68a;
+  --warn:#ff5d73;
+  /* microbes and labs */
+  --amoeba-a:#ff4fa3; --amoeba-b:#8fe04f;
+  --lab-1:#36d1dc; --lab-2:#ffb648; --lab-3:#a77bff;
+  --glass:rgba(220,250,245,.08); --rim:rgba(220,250,245,.35);
+  --good:#8fe04f; --bad:#ff5d73;
+  --font:"Avenir Next","Segoe UI","Helvetica Neue",Arial,sans-serif;
+  --font-display:"SF Mono","Menlo","Consolas","Roboto Mono",monospace;
+  --display-weight:700; --display-case:uppercase; --display-spacing:.08em;
+  --r-lg:18px; --r-md:14px; --r-sm:10px; --r-tile:50%;
+  --lift:0 12px 30px rgba(0,0,0,.5);
+}

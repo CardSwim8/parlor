@@ -1,0 +1,7 @@
+/* Hub card art for this game (loaded by the Parlor hub with brand.css). */
+/* Petri Dash: a few dishes in a row */
+.art.dishes{gap:12px}
+.art.dishes i{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.22),var(--glass) 45%,rgba(0,0,0,.2));box-shadow:inset 0 0 0 2px var(--rim)}
+.art.dishes i.hit{box-shadow:inset 0 0 0 3px var(--good),0 0 18px var(--good)}
+.art.dishes svg{width:80%;height:80%}

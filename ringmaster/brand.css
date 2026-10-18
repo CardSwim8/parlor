@@ -1,0 +1,22 @@
+/* Ringmaster brand: the big top at night. Deep crimson, red-and-cream tent stripes, gold leaf,
+   high-contrast poster serif.
+   Applied by <html class="brand-ringmaster"> on the game page and by .brand-ringmaster on the hub card. */
+html.brand-ringmaster,.brand-ringmaster{
+  color-scheme:dark;
+  --bg:#3b0d12; --bg2:#260709; --bg-glow:#55151c;
+  --text:#f7ead0; --muted:#d6b9a0;
+  --well:rgba(0,0,0,.3); --soft:rgba(255,255,255,.08); --line:rgba(247,234,208,.25);
+  --surface:#6e1a22; --surface-hi:#86232c; --surface-edge:#4a1016;
+  --tile:#f4e4c1; --tile-hi:#fff4dc; --tile-shade:#dcc59a;
+  --paper:#fbf1dc; --ink:#2a1214; --ink-soft:#5a3a2e; --ink-faint:#9a7b62;
+  --accent:#e8b04a; --accent-ink:#2a1214; --accent-edge:#a87818; --accent-soft:#f3d79a;
+  --warn:#ff7a5c;
+  /* the two podiums */
+  --left:#c62a35; --left-edge:#8e1720; --right:#1f7a8c; --right-edge:#14525e; --stripe:#f4e4c1;
+  --good:#7fd38a; --bad:#ff8a7a;
+  --font:"Avenir Next","Segoe UI","Helvetica Neue",Arial,sans-serif;
+  --font-display:"Bodoni 72","Didot","Bodoni MT","Playfair Display","Georgia",serif;
+  --display-weight:700; --display-case:uppercase; --display-spacing:.06em;
+  --r-lg:12px; --r-md:10px; --r-sm:8px; --r-tile:50%;
+  --lift:0 12px 28px rgba(0,0,0,.45);
+}

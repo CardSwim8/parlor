@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" class="brand-cover-story">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#191a17">
+<title>Cover Story</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../icons/cover-story-180.png">
+<link rel="icon" href="../icons/cover-story-180.png">
+<link rel="stylesheet" href="../shared/theme.css">
+<link rel="stylesheet" href="brand.css">
+<style>
+:root{ --board-w:min(96vw, calc((100vh - 220px) * 1.45), 1100px); }
+@supports (height:100dvh){ :root{ --board-w:min(96vw, calc((100dvh - 220px) * 1.45), 1100px); } }
+
+/* ---------- Setup: the title is a case file with a rubber stamp ---------- */
+.folder{position:relative;width:min(440px,86vw);margin-top:22px;padding:30px 24px 24px;display:flex;flex-direction:column;align-items:center;gap:16px;
+  background:linear-gradient(170deg,var(--tile-hi),var(--tile) 55%,var(--tile-shade));color:var(--ink);
+  border-radius:0 var(--r-lg) var(--r-lg) var(--r-lg);box-shadow:var(--lift);transform:rotate(-1.5deg)}
+.folder::before{content:"";position:absolute;left:0;top:-20px;width:40%;height:21px;background:var(--tile-hi);border-radius:var(--r-lg) var(--r-lg) 0 0}
+.typed{font-size:13px;color:var(--ink-soft);letter-spacing:.2em}
+.stamp{margin:0;font-size:min(12vw,60px);line-height:1.05;text-align:center;color:var(--accent);border:5px solid var(--accent);padding:10px 18px;border-radius:var(--r-md);transform:rotate(-4deg);opacity:.92}
+.primary{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.1em;font-size:22px}
+.join{display:flex;gap:10px}
+.join .field{flex:1;font-family:var(--font-display);text-transform:uppercase;letter-spacing:.3em;font-size:22px;font-weight:700;text-align:center}
+.join .ghost{flex:none}
+.seg.side{align-self:center;margin-top:-8px}
+.setup h2{font-size:14px;color:var(--muted);margin:10px 0 -10px}
+
+/* ---------- Status row above the board ---------- */
+.play{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;gap:12px;padding:0 12px 16px;min-height:0}
+.status{width:var(--board-w);display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-height:48px}
+.turn{display:inline-flex;align-items:center;gap:10px;font-size:20px;font-family:var(--font-display);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.turn .why{font-family:var(--font);font-size:16px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted)}
+.dot{width:16px;height:16px;border-radius:50%;flex:none;box-shadow:0 0 0 2px rgba(255,255,255,.25)}
+.dot.A{background:var(--team-a)} .dot.B{background:var(--team-b)}
+.chips{display:flex;gap:6px;margin-left:auto}
+.chip{min-width:44px;text-align:center;padding:6px 10px;border-radius:var(--r-sm);font-weight:700;font-size:18px;font-variant-numeric:tabular-nums;color:#fff}
+.chip.A{background:var(--team-a)} .chip.B{background:var(--team-b)}
+.chip.G{background:var(--agent)} .chip.T{background:var(--tile);color:var(--ink)}
+.who{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:var(--r-sm);background:var(--tile);color:var(--ink);font-size:18px;flex:none}
+#guesserSeg button{padding:8px 14px;min-height:40px;font-size:16px}
+.foot{width:var(--board-w);color:var(--muted);font-size:15px;text-align:center;margin:0}
+.foot b{color:var(--text);letter-spacing:.15em}
+
+/* ---------- Card grid (board and key share it) ---------- */
+.cards{
+  width:var(--board-w);display:grid;grid-template-columns:repeat(5,1fr);
+  gap:calc(var(--board-w)*.012);padding:calc(var(--board-w)*.016);
+  border-radius:var(--r-lg);
+}
+.card{
+  aspect-ratio:1.55;border:0;padding:0 3%;border-radius:var(--r-tile);
+  font-family:var(--font-display);font-size:max(10px, calc(var(--board-w)*.027));letter-spacing:.04em;
+  transition:transform .15s, background .25s;
+}
+.card .w{white-space:nowrap}
+.card.long .w{font-size:.86em;letter-spacing:.02em}
+.card.armed{outline:4px solid var(--accent);outline-offset:0;transform:translateY(-3px)}
+.card.armed::after{content:"tap again";position:absolute;bottom:7%;font-size:.42em;font-weight:600;letter-spacing:.04em;color:var(--accent-edge)}
+/* revealed cards, and every card on the key */
+.card.rv.A,.key .card.A{background:linear-gradient(145deg,var(--team-a-hi),var(--team-a) 45%,var(--team-a-edge));color:#fff}
+.card.rv.B,.key .card.B{background:linear-gradient(145deg,var(--team-b-hi),var(--team-b) 45%,var(--team-b-edge));color:#fff}
+.card.rv.G,.key .card.G{background:linear-gradient(145deg,var(--agent-hi),var(--agent) 45%,var(--agent-edge));color:#fff}
+.card.rv.N,.key .card.N{background:linear-gradient(145deg,var(--neutral-hi),var(--neutral) 45%,var(--neutral-edge));color:var(--ink-soft)}
+.card.rv.X,.key .card.X{background:linear-gradient(145deg,var(--assassin-hi),var(--assassin) 45%,var(--assassin-edge));color:var(--tile)}
+.card.rv .w{opacity:.7;font-size:.8em}
+.card.rv.X .w::before,.key .card.X .w::before{content:"✕ "}
+/* game over: show what every unturned card was */
+.over .card:not(.rv).A{box-shadow:inset 0 0 0 .32em var(--team-a),0 4px 6px rgba(0,0,0,.35)}
+.over .card:not(.rv).B{box-shadow:inset 0 0 0 .32em var(--team-b),0 4px 6px rgba(0,0,0,.35)}
+.over .card:not(.rv).G{box-shadow:inset 0 0 0 .32em var(--agent),0 4px 6px rgba(0,0,0,.35)}
+.over .card:not(.rv).N{box-shadow:inset 0 0 0 .32em var(--neutral-edge),0 4px 6px rgba(0,0,0,.35)}
+.over .card:not(.rv).X{box-shadow:inset 0 0 0 .32em var(--assassin),0 4px 6px rgba(0,0,0,.35)}
+/* Duet: a tag per player whose key says "bystander"; the card stays open for the other player's key */
+.tag{position:absolute;top:7%;font-family:var(--font);font-size:.5em;font-weight:700;line-height:1;padding:.25em .5em;border-radius:var(--r-sm);background:var(--neutral-edge);color:#fff}
+.tag.a{left:5%} .tag.b{right:5%}
+.card.spent{opacity:.75}
+.key .card.done{opacity:.28}
+.key .card.done .w{text-decoration:line-through}
+
+@media (prefers-reduced-motion:reduce){.card{transition:none}}
+@media (max-width:560px){.turn{font-size:18px}.chip{font-size:16px;min-width:38px}.status{gap:8px}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="bar">
+    <div class="left">
+      <a class="home" id="homeLink" href="../">‹ Games</a>
+      <nav class="tabs" id="tabs" role="tablist" hidden>
+        <button role="tab" data-tab="settings" aria-selected="true">Settings</button>
+        <button role="tab" data-tab="board" aria-selected="false" id="boardTab">Board</button>
+        <button role="tab" data-tab="key" aria-selected="false" id="keyTab">Key</button>
+      </nav>
+    </div>
+    <div class="center"></div>
+    <div class="right">
+      <button class="ghost strong" id="againBtn" hidden>New game</button>
+    </div>
+  </header>
+
+  <main class="setup" id="setup">
+  <div class="folder">
+    <span class="typed display">Case file · eyes only</span>
+    <h1 class="stamp display">Cover<br>Story</h1>
+    <span class="typed display" id="modeSub">25 words · 2 teams · 1 assassin</span>
+  </div>
+  <section class="controls">
+    <div class="row">
+      <span>Mode</span>
+      <div class="seg" id="segMode">
+        <button data-v="teams">Teams</button>
+        <button data-v="duet">Duet · 2 players</button>
+      </div>
+    </div>
+    <div class="row" id="turnsRow" hidden>
+      <span>Turns</span>
+      <div class="stepper">
+        <button id="turnsMinus" aria-label="Fewer turns">−</button>
+        <output id="turnsOut">9</output>
+        <button id="turnsPlus" aria-label="More turns">+</button>
+      </div>
+    </div>
+    <button class="primary" id="start">Deal a new board</button>
+    <p class="note" id="savedNote" hidden></p>
+    <h2 class="display">Need the key on this device?</h2>
+    <form class="join" id="joinForm" autocomplete="off">
+      <input class="field" id="joinCode" maxlength="5" placeholder="CODE" aria-label="Game code" autocapitalize="characters" autocorrect="off" spellcheck="false">
+      <button class="ghost strong" type="submit">Show key</button>
+    </form>
+    <div class="seg side" id="joinSide" hidden>
+      <button type="button" data-v="A">I'm side A</button>
+      <button type="button" data-v="B">I'm side B</button>
+    </div>
+    <p class="note" id="joinMsg">Enter the code shown under the board to see the key on this device.</p>
+  </section>
+  <p class="credit" id="credit">Two teams, 25 words. Each team's spymaster gives one-word clues plus a number; teammates tap the cards they think are theirs. Find all your agents first, and never touch the assassin.</p>
+  </main>
+
+  <div class="play" id="boardView" hidden>
+    <div class="status">
+      <span class="turn" id="turn"></span>
+      <div class="seg" id="guesserSeg" hidden>
+        <button data-v="A">A guesses</button>
+        <button data-v="B">B guesses</button>
+      </div>
+      <span class="chips" id="chips"></span>
+      <button class="ghost strong" id="endTurnBtn">End turn</button>
+    </div>
+    <div class="cards surface" id="board"></div>
+    <p class="foot" id="boardFoot"></p>
+  </div>
+
+  <div class="play" id="keyView" hidden>
+    <div class="status">
+      <span class="turn" id="keyTitle"></span>
+      <span class="chips"><button class="ghost" id="closeKeyBtn">Close key</button></span>
+    </div>
+    <div class="cards surface key" id="key"></div>
+    <p class="foot" id="keyFoot"></p>
+  </div>
+</div>
+
+<script src="../shared/core.js"></script>
+<script src="../shared/words/nouns.js"></script>
+<script src="cover-story.js"></script>
+</body>
+</html>

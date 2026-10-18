@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" class="brand-petri-dash">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0d1b22">
+<title>Petri Dash</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../icons/petri-dash-180.png">
+<link rel="icon" href="../icons/petri-dash-180.png">
+<link rel="stylesheet" href="../shared/theme.css">
+<link rel="stylesheet" href="brand.css">
+<style>
+/* ---------- Setup ---------- */
+.hero{display:flex;flex-direction:column;align-items:center;gap:16px}
+.hero .dish{width:min(44vw,210px);height:min(44vw,210px)}
+.hero h1{margin:0;font-family:var(--font-display);font-size:min(11vw,64px);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);text-shadow:0 0 24px rgba(255,210,63,.35)}
+.rules{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;color:var(--muted);font-size:16px;line-height:1.4}
+.rules li{display:flex;gap:12px;align-items:center}
+.rules svg{width:44px;height:44px;flex:none}
+
+/* ---------- Lab ---------- */
+:root{ --lab:min(94vw, calc(100vh - 360px), 900px); --ratio:1; }
+@supports (height:100dvh){ :root{ --lab:min(94vw, calc(100dvh - 360px), 900px); } }
+.play{flex:1;width:100%;min-height:0;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:14px;padding:0 12px 20px}
+@media (min-aspect-ratio:1/1) and (min-width:700px){
+  :root{ --lab:min(calc(100vw - 360px), calc((100vh - 110px) * 1.25), 980px); --ratio:1.25; }
+  @supports (height:100dvh){ :root{ --lab:min(calc(100vw - 360px), calc((100dvh - 110px) * 1.25), 980px); } }
+  .play{flex-direction:row;align-items:flex-start;justify-content:center;overflow:hidden}
+}
+.bench{position:relative;width:var(--lab);aspect-ratio:var(--ratio);flex:none;border-radius:var(--r-lg);overflow:hidden}
+.dish{position:absolute;transform:translate(-50%,-50%);border-radius:50%;border:0;padding:0;
+  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.22),var(--glass) 45%,rgba(0,0,0,.2));box-shadow:inset 0 0 0 2px var(--rim),0 4px 10px rgba(0,0,0,.4);
+  display:flex;align-items:center;justify-content:center;transition:box-shadow .2s, transform .2s}
+.bench .dish{width:calc(var(--lab) * .092);height:calc(var(--lab) * .092)}
+.dish svg{width:82%;height:82%;overflow:visible}
+.hero .dish{position:relative;transform:none}
+.dish.trail{box-shadow:inset 0 0 0 3px var(--accent),0 0 18px rgba(255,210,63,.5)}
+.dish.hit{box-shadow:inset 0 0 0 4px var(--good),0 0 26px var(--good);transform:translate(-50%,-50%) scale(1.15);z-index:2}
+.dish.miss{box-shadow:inset 0 0 0 4px var(--bad),0 0 20px var(--bad)}
+.dish.miss svg{opacity:.4}
+.center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:calc(var(--lab) * .02)}
+.dice{display:flex;gap:calc(var(--lab) * .018)}
+.die{width:calc(var(--lab) * .095);height:calc(var(--lab) * .095);border-radius:var(--r-md);background:var(--paper);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 -4px 0 rgba(0,0,0,.15),0 6px 12px rgba(0,0,0,.4)}
+.die svg{width:76%;height:76%}
+.die.blank{background:var(--well);box-shadow:inset 0 0 0 2px var(--line)}
+.dice.tumble .die{animation:tumble .12s linear infinite alternate}
+@keyframes tumble{from{transform:rotate(-12deg) translateY(-3px)}to{transform:rotate(12deg) translateY(3px)}}
+.center .primary{margin:0;font-family:var(--font-display);text-transform:uppercase;letter-spacing:.1em;font-size:calc(var(--lab) * .03);padding:calc(var(--lab) * .016) calc(var(--lab) * .04);min-height:0}
+
+/* ---------- Panel ---------- */
+.panel{width:min(var(--lab),100%);display:flex;flex-direction:column;gap:12px}
+@media (min-aspect-ratio:1/1) and (min-width:700px){ .panel{width:300px;flex:none;max-height:calc(100dvh - 100px);overflow-y:auto} }
+.box{background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px;display:flex;flex-direction:column;gap:10px}
+.msg{margin:0;font-size:17px;line-height:1.4}
+.msg b{font-family:var(--font-display);letter-spacing:.06em}
+.msg.good b{color:var(--good)} .msg.bad b{color:var(--bad)}
+.box .ghost{width:100%}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="bar">
+    <div class="left">
+      <a class="home" id="homeLink" href="../">‹ Games</a>
+      <nav class="tabs" id="tabs" role="tablist" hidden>
+        <button role="tab" data-tab="settings" aria-selected="true">Settings</button>
+        <button role="tab" data-tab="game" aria-selected="false">Lab</button>
+      </nav>
+    </div>
+    <div class="center"></div>
+    <div class="right"><button class="ghost strong" id="againBtn" hidden>New game</button></div>
+  </header>
+
+  <main class="setup" id="setup">
+    <div class="hero">
+      <div class="dish" id="heroDish"></div>
+      <h1>Petri Dash</h1>
+    </div>
+    <section class="controls">
+      <button class="primary" id="start">Open the lab</button>
+      <p class="note" id="savedNote" hidden></p>
+      <div class="label">How the escape works</div>
+      <ul class="rules" id="rules"></ul>
+    </section>
+  </main>
+
+  <div class="play" id="gameView" hidden>
+    <div class="bench surface" id="bench">
+      <div id="dishes"></div>
+      <div class="center">
+        <div class="dice" id="dice"></div>
+        <button class="primary" id="rollBtn">Roll</button>
+      </div>
+    </div>
+    <aside class="panel">
+      <div class="box">
+        <p class="msg" id="msg"></p>
+        <button class="ghost" id="traceBtn">Show the escape route</button>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script src="../shared/core.js"></script>
+<script src="petri-dash.js"></script>
+</body>
+</html>

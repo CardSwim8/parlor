@@ -1,0 +1,22 @@
+/* Triad brand: a Bauhaus poster. Off-white paper, a black board, three bold primaries
+   (coral, teal, mustard), geometric lettering, crisp medium corners.
+   Applied by <html class="brand-triad"> on the game page and by .brand-triad on the hub card. */
+html.brand-triad,.brand-triad{
+  color-scheme:light;
+  --bg:#f2ede4; --bg2:#e7e0d3; --bg-glow:#faf7f1;
+  --text:#1d1d1f; --muted:#6b665d;
+  --well:rgba(29,29,31,.08); --soft:rgba(29,29,31,.06); --line:rgba(29,29,31,.2);
+  --surface:#232325; --surface-hi:#2e2e31; --surface-edge:#161617;
+  --tile:#ffffff; --tile-hi:#ffffff; --tile-shade:#ece6db;
+  --paper:#fffdf8; --ink:#1d1d1f; --ink-soft:#3d3a35; --ink-faint:#9a948a;
+  --accent:#e4572e; --accent-ink:#ffffff; --accent-edge:#a83a1a; --accent-soft:#f3b19c;
+  --warn:#d1342b;
+  /* the three card colours */
+  --c1:#e4572e; --c2:#17a398; --c3:#f3a712;
+  --good:#17a398; --bad:#d1342b;
+  --font:"Avenir Next","Segoe UI","Helvetica Neue",Arial,sans-serif;
+  --font-display:"Gill Sans","Gill Sans MT","Century Gothic","Josefin Sans","Avenir Next",sans-serif;
+  --display-weight:700; --display-case:uppercase; --display-spacing:.12em;
+  --r-lg:12px; --r-md:9px; --r-sm:6px; --r-tile:10%;
+  --lift:0 8px 22px rgba(29,29,31,.16);
+}

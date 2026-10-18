@@ -1,0 +1,23 @@
+/* No Echo brand: a late-night party around a whiteboard. Deep violet room, pastel sticky notes,
+   hot-pink marker, rounded type and handwritten clues.
+   Applied by <html class="brand-no-echo"> on the game page and by .brand-no-echo on the hub card. */
+html.brand-no-echo,.brand-no-echo{
+  color-scheme:dark;
+  --bg:#2a1745; --bg2:#1b0e2e; --bg-glow:#3d2263;
+  --text:#f6effe; --muted:#c3b3dc;
+  --well:rgba(0,0,0,.3); --soft:rgba(255,255,255,.09); --line:rgba(246,239,254,.24);
+  --surface:#3f2668; --surface-hi:#4d3080; --surface-edge:#2c1a4b;
+  --tile:#ffe680; --tile-hi:#fff2ad; --tile-shade:#f0cf55;
+  --paper:#fffaf0; --ink:#2a2233; --ink-soft:#4a3f57; --ink-faint:#8c809b;
+  --accent:#ff5fa2; --accent-ink:#ffffff; --accent-edge:#c23a7a; --accent-soft:#ffb3d3;
+  --warn:#ff8a5c;
+  /* sticky-note colours, used in turn for each player's clue */
+  --note-1:#ffe680; --note-2:#ffb3cf; --note-3:#a8ecc8; --note-4:#a9d4ff; --note-5:#ffc999; --note-6:#d9c2ff;
+  --good:#5fd39a; --bad:#ff6f7d;
+  --font:"Avenir Next","Nunito","Segoe UI","Helvetica Neue",Arial,sans-serif;
+  --font-display:"Arial Rounded MT Bold","Varela Round","Nunito","Avenir Next",sans-serif;
+  --font-hand:"Marker Felt","Chalkboard SE","Segoe Print","Comic Sans MS",cursive;
+  --display-weight:700; --display-case:none; --display-spacing:0;
+  --r-lg:22px; --r-md:16px; --r-sm:12px; --r-tile:10%;
+  --lift:0 12px 30px rgba(0,0,0,.4);
+}
