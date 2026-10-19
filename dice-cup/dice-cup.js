@@ -1,12 +1,13 @@
 "use strict";
-/* Dice Cup: pick dice, roll them. No rules and no scoring: just the dice, a total, holds and a history.
-   Tap a die on the shelf to put it in the cup; tap a die in the cup to hold it (it stays put when you
-   roll); press and hold (or right-click, or Delete) to take it out. */
+/* Dice Cup: pick dice, roll them. No rules and no scoring, just the dice.
+   Two tabs: Roll (the tray: tap a die to hold it, then roll the rest) and Dice (choose what's in the
+   cup, in which colour, and make your own dice). */
 var $ = Parlor.$, rnd = Parlor.rnd, esc = Parlor.esc, store = Parlor.store("dice-cup");
 
 /* ===== Dice types =====
-   Every die is a list of faces. A face has t (what it says), v (its number, if it adds to the total)
-   and optionally g (a drawn glyph instead of text). shape picks the outline it's drawn with. */
+   Every die is a list of faces. A face has t (what it says), optionally v (its number, for pips) and
+   g (a drawn glyph instead of text). shape picks the outline it's drawn with; desc explains the
+   less familiar ones on the Dice tab. */
 function range(a, b){ var r = []; for (var i = a; i <= b; i++) r.push(i); return r; }
 function nums(list){ return list.map(function(n){ return { v: n, t: String(n) }; }); }
 var TYPES = {
@@ -17,31 +18,35 @@ var TYPES = {
   d12:  { label: "d12",  shape: "d12",  faces: nums(range(1, 12)) },
   d20:  { label: "d20",  shape: "d20",  faces: nums(range(1, 20)) },
   d100: { label: "d100", shape: "ball", faces: nums(range(1, 100)) },
-  coin: { label: "Coin", shape: "coin", faces: [{ t: "Heads", chip: "Heads" }, { t: "Tails", chip: "Tails" }], sample: 0 },
-  d3:   { label: "d3",   shape: "d3",   faces: nums(range(1, 3)) },
+  coin: { label: "Coin", shape: "coin", sample: 0, faces: [{ t: "Heads" }, { t: "Tails" }],
+          desc: "Heads or tails." },
+  d3:   { label: "d3",   shape: "d3",   faces: nums(range(1, 3)),
+          desc: "Numbered 1 to 3, for a one-in-three chance." },
   fate: { label: "Fate", shape: "cube", signed: true, sample: 0, faces: [
-    { v: 1, t: "+", g: "plus" }, { v: 1, t: "+", g: "plus" }, { v: -1, t: "−", g: "minus" },
-    { v: -1, t: "−", g: "minus" }, { v: 0, t: "0", g: "blank" }, { v: 0, t: "0", g: "blank" }] },
-  avg:  { label: "Average", shape: "cube", faces: nums([2, 3, 3, 4, 4, 5]) },
-  poker: { label: "Poker", shape: "cube", faces: ["9", "10", "J", "Q", "K", "A"].map(function(t){ return { t: t }; }) },
+    { t: "+", g: "plus" }, { t: "+", g: "plus" }, { t: "−", g: "minus" }, { t: "−", g: "minus" }, { t: "blank", g: "blank" }, { t: "blank", g: "blank" }],
+          desc: "Also called Fudge dice. Two plus, two minus and two blank faces. Fate and Fudge role-playing games roll four and add them up, giving −4 to +4." },
+  avg:  { label: "Average", shape: "cube", faces: nums([2, 3, 3, 4, 4, 5]),
+          desc: "Faces 2, 3, 3, 4, 4, 5: a d6 without the 1 and 6, so rolls stay near the middle. Common in war games." },
+  poker: { label: "Poker", shape: "cube", faces: ["9", "10", "J", "Q", "K", "A"].map(function(t){ return { t: t }; }),
+          desc: "Faces 9, 10, J, Q, K and A. Roll five and read them as a poker hand." },
   crown: { label: "Crown & Anchor", shape: "cube", sample: 4, faces: [
-    { t: "Spade", g: "spade", chip: "♠︎" }, { t: "Heart", g: "heart", chip: "♥︎" }, { t: "Diamond", g: "diamond", chip: "♦︎" },
-    { t: "Club", g: "club", chip: "♣︎" }, { t: "Crown", g: "crown" }, { t: "Anchor", g: "anchor" }] },
-  colour: { label: "Colour", shape: "cube", fixed: "ivory", sample: 0, faces: ["Red", "Orange", "Yellow", "Green", "Blue", "Purple"].map(function(t){ return { t: t, g: "swatch" }; }) },
-  double: { label: "Doubling cube", shape: "cube", faces: nums([2, 4, 8, 16, 32, 64]) }
+    { t: "Spade", g: "spade" }, { t: "Heart", g: "heart" }, { t: "Diamond", g: "diamond" },
+    { t: "Club", g: "club" }, { t: "Crown", g: "crown" }, { t: "Anchor", g: "anchor" }],
+          desc: "Spade, heart, diamond, club, crown and anchor, from an old sailors' betting game. Usually rolled three at a time." },
+  colour: { label: "Colour", shape: "cube", fixed: "ivory", sample: 0, faces: ["Red", "Orange", "Yellow", "Green", "Blue", "Purple"].map(function(t){ return { t: t, g: "swatch" }; }),
+          desc: "Six colours instead of numbers. Handy for picking a colour, a player or a category at random." }
 };
 var STANDARD = ["d4", "d6", "d8", "d10", "d12", "d20", "d100"];
-var SPECIALTY = ["coin", "d3", "fate", "avg", "poker", "crown", "colour", "double"];
+var SPECIALTY = ["coin", "d3", "fate", "avg", "poker", "crown", "colour"];
 var COLOURS = ["ivory", "red", "blue", "green", "gold", "purple", "black"];
-var MAX_DICE = 60, MAX_HISTORY = 50, SIDE_CHIPS = [2, 5, 7, 14, 16, 24, 30, 50];
+var MAX_DICE = 60, SIDE_CHIPS = [2, 5, 7, 14, 16, 24, 30, 50];
 
 function shapeFor(n){ return { 2: "coin", 3: "d3", 4: "d4", 6: "cube", 8: "d8", 10: "d10", 12: "d12", 20: "d20" }[n] || (n >= 30 ? "ball" : "gem"); }
 // A die you made: { id, label, sides } or { id, label, faces: [text, ...] }. Built into a type when used.
 function buildCustom(c){
-  var faces = c.sides ? nums(range(1, c.sides)) : c.faces.map(function(t){
-    var n = Number(t); return /^[-+]?\d+(\.\d+)?$/.test(t) && isFinite(n) ? { v: n, t: t } : { t: t };
-  });
-  return { label: c.label, shape: shapeFor(faces.length), faces: faces, custom: true, sample: c.sides ? undefined : 0 };
+  var faces = c.sides ? nums(range(1, c.sides)) : c.faces.map(function(t){ return { t: t }; });
+  return { label: c.label, shape: shapeFor(faces.length), faces: faces, custom: true, sample: c.sides ? undefined : 0,
+           desc: c.sides ? "Numbered 1 to " + c.sides + "." : "Faces: " + c.faces.join(", ") + "." };
 }
 var customCache = {};
 function typeOf(id){
@@ -53,16 +58,17 @@ function typeOf(id){
   }
   return customCache[id];
 }
-function isNumeric(t){ return t.faces.every(function(f){ return typeof f.v === "number"; }); }
 function sampleFace(t){ return t.sample != null ? t.sample : t.faces.length - 1; }
 function dieName(t){ return /^d\d+$/.test(t.label) ? t.label : t.label + (t.custom ? "" : " die"); }
 
 /* ===== State =====
-   dice: [{ id, type, c (colour), f (face index, null until rolled), h (held), tilt }] */
+   dice: [{ id, type, c (colour), f (face index, null until rolled), h (held), tilt }]
+   view: "roll" or "dice" (the tab showing) */
 var state = Object.assign({
   dice: [{ type: "d6", c: "ivory", f: null, h: false }, { type: "d6", c: "ivory", f: null, h: false }],
-  colour: "ivory", mod: 0, customs: [], history: [], sound: true
+  colour: "ivory", customs: [], sound: true, view: "roll"
 }, store.get("state") || {});
+delete state.history; delete state.mod; // kept by an earlier version
 var nextId = 1;
 state.dice = state.dice.filter(function(d){ return typeOf(d.type); });
 state.dice.forEach(function(d){ d.id = nextId++; });
@@ -124,15 +130,14 @@ function dieSVG(t, f){
     h += '<path class="ul" d="M' + (sh.x - fs * .28).toFixed(1) + " " + (sh.y + fs * .62).toFixed(1) + "h" + (fs * .56).toFixed(1) + '"/>';
   return h;
 }
-function faceText(t, f){ var face = t.faces[f]; return face.chip || face.t; }
 function faceLabel(t, f){ // spoken
   var face = t.faces[f];
-  if (t.signed) return face.v > 0 ? "plus" : face.v < 0 ? "minus" : "blank";
-  return face.t;
+  return t.signed ? face.g : face.t;
 }
 
 /* ===== Changing what's in the cup ===== */
-var fresh = null; // id of a die just added, so it drops in
+var fresh = []; // dice added since the tray was last shown, so they drop in
+function count(typeId){ return state.dice.filter(function(d){ return d.type === typeId; }).length; }
 function addDie(typeId){
   if (state.dice.length >= MAX_DICE){ toast("The cup holds " + MAX_DICE + " dice at most."); return; }
   var t = typeOf(typeId), c = t.fixed || state.colour;
@@ -141,28 +146,20 @@ function addDie(typeId){
   var at = -1;
   state.dice.forEach(function(x, i){ if (x.type === typeId && x.c === c) at = i; });
   if (at < 0) state.dice.push(d); else state.dice.splice(at + 1, 0, d);
-  fresh = d.id; save(); render();
+  fresh.push(d.id); save(); render();
   buzz(8);
 }
-function snapshot(){ return JSON.parse(JSON.stringify(state.dice)); }
-function restore(snap){ state.dice = snap; save(); render(); }
-function removeDie(id){
-  var i = state.dice.findIndex(function(d){ return d.id === id; }); if (i < 0) return;
-  var snap = snapshot(), t = typeOf(state.dice[i].type);
-  state.dice.splice(i, 1); save(); render();
-  buzz(15);
-  toast("Took out a " + dieName(t) + ".", function(){ restore(snap); });
-}
-function removeOne(typeId){ // shelf "−": the last one of that type, preferring dice that aren't held
+function removeOne(typeId){ // the last one of that type, preferring dice that aren't held
   var pick = -1;
   state.dice.forEach(function(d, i){ if (d.type === typeId && (pick < 0 || !d.h || state.dice[pick].h)) pick = i; });
-  if (pick >= 0) removeDie(state.dice[pick].id);
+  if (pick < 0) return;
+  state.dice.splice(pick, 1); save(); render();
 }
 function clearAll(){
   if (!state.dice.length) return;
-  var snap = snapshot();
+  var snap = JSON.parse(JSON.stringify(state.dice));
   state.dice = []; save(); render();
-  toast("Emptied the cup.", function(){ restore(snap); });
+  toast("Emptied the cup.", function(){ state.dice = snap; save(); render(); });
 }
 function toggleHold(id){
   var d = state.dice.filter(function(x){ return x.id === id; })[0]; if (!d) return;
@@ -170,20 +167,27 @@ function toggleHold(id){
   d.h = !d.h; save(); render(); buzz(8);
 }
 function releaseAll(){ state.dice.forEach(function(d){ d.h = false; }); save(); render(); }
+// what's in the cup, e.g. "2d6 + d20 + Coin ×2"
+function summary(){
+  var order = [], n = {};
+  state.dice.forEach(function(d){ if (!n[d.type]){ n[d.type] = 0; order.push(d.type); } n[d.type]++; });
+  return order.map(function(id){
+    var l = typeOf(id).label;
+    return /^d\d+$/.test(l) ? (n[id] > 1 ? n[id] : "") + l : l + (n[id] > 1 ? " ×" + n[id] : "");
+  }).join(" + ");
+}
 
 /* ===== Rolling ===== */
 var rolling = false;
 var reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
 function roll(){
   var go = state.dice.filter(function(d){ return !d.h; });
-  if (rolling || !go.length) return;
+  if (rolling || !go.length || state.view !== "roll") return;
   go.forEach(function(d){ d.f = rnd(typeOf(d.type).faces.length); d.tilt = rnd(21) - 10; });
-  logRoll(go); save();
-  clatter(go.length); buzz(25);
-  if (reduceMotion){ render(); return; }
+  save(); clatter(go.length); buzz(25);
+  if (reduceMotion){ render(); announce(); return; }
 
   rolling = true; render();
-  $("results").classList.add("rolling");
   var longest = 0;
   go.forEach(function(d){
     var el = $("tray").querySelector('[data-id="' + d.id + '"]'); if (!el) return;
@@ -194,77 +198,17 @@ function roll(){
     var flick = setInterval(function(){ svg.innerHTML = dieSVG(t, rnd(t.faces.length)); }, 70);
     setTimeout(function(){ clearInterval(flick); svg.innerHTML = dieSVG(t, d.f); }, dur - 90);
   });
-  setTimeout(function(){ rolling = false; render(); }, longest + 20);
+  setTimeout(function(){ rolling = false; render(); announce(); }, longest + 20);
 }
-
-/* ===== Totals ===== */
-function groups(dice){ // dice of the same type and colour, in the order they first appear
-  var out = [], byKey = {};
-  dice.forEach(function(d){
-    var k = d.type + "|" + d.c;
-    if (!byKey[k]){ byKey[k] = { type: d.type, c: d.c, t: typeOf(d.type), dice: [] }; out.push(byKey[k]); }
-    byKey[k].dice.push(d);
-  });
-  var colours = {}; // name the colour only when a type comes in more than one
-  out.forEach(function(g){ (colours[g.type] = colours[g.type] || {})[g.c] = 1; });
-  out.forEach(function(g){ g.showColour = Object.keys(colours[g.type]).length > 1 && !g.t.fixed; });
-  return out;
-}
-function groupName(g){
-  var n = g.dice.length, l = g.t.label;
-  return /^d\d+$/.test(l) ? (n > 1 ? n : "") + l : l + (n > 1 ? " ×" + n : "");
-}
-function signed(n){ return n > 0 ? "+" + n : n < 0 ? "−" + Math.abs(n) : "0"; }
-function fmtNum(n, allSigned){ return allSigned ? signed(n) : String(n).replace("-", "−"); }
-function totals(dice){ // { sum, count (numeric dice), allSigned }
-  var sum = 0, count = 0, allSigned = true;
-  dice.forEach(function(d){
-    var t = typeOf(d.type); if (!isNumeric(t)) return;
-    sum += t.faces[d.f].v; count++; if (!t.signed) allSigned = false;
-  });
-  return { sum: Math.round(sum * 1000) / 1000, count: count, allSigned: allSigned && count > 0 };
-}
-function summary(dice){ return groups(dice).map(groupName).join(" + "); }
-
-/* ===== History ===== */
-function logRoll(rolled){
-  var all = state.dice.filter(function(d){ return d.f != null; }), tot = totals(all);
-  state.history.unshift({
-    at: Date.now(),
-    dice: all.map(function(d){ return { type: d.type, c: d.c, f: d.f, h: d.h }; }),
-    mod: state.mod, total: tot.count ? tot.sum + state.mod : null, signed: tot.allSigned,
-    rerolled: rolled.length < all.length ? rolled.length : 0
-  });
-  state.history.length = Math.min(state.history.length, MAX_HISTORY);
-}
-function renderHistory(){
-  var list = state.history.filter(function(e){ return e.dice.every(function(d){ return typeOf(d.type); }); });
-  $("histNote").textContent = list.length ? "Tap a roll to put those dice back in the cup." : "Nothing rolled yet.";
-  $("histClear").hidden = !list.length;
-  $("histList").innerHTML = list.map(function(e){
-    var i = state.history.indexOf(e);
-    var what = summary(e.dice) + (e.mod ? " " + signed(e.mod).replace("−", "− ").replace("+", "+ ") : "");
-    var faces = groups(e.dice).map(function(g){ return g.dice.map(function(d){ return faceText(g.t, d.f); }).join(" "); }).join(" · ");
-    var time = new Date(e.at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) + (e.rerolled ? " · rerolled " + e.rerolled : "");
-    return '<li><button data-h="' + i + '"><span class="what">' + esc(what) + '</span>' +
-           '<span class="when">' + (e.total == null ? "" : esc(fmtNum(e.total, e.signed && !e.mod))) + '</span>' +
-           '<span class="faces">' + esc(faces) + ' <span class="time">· ' + esc(time) + '</span></span></button></li>';
-  }).join("");
-}
-function restoreHistory(i){
-  var e = state.history[i]; if (!e) return;
-  var snap = snapshot();
-  state.dice = e.dice.filter(function(d){ return typeOf(d.type); }).map(function(d){
-    return { id: nextId++, type: d.type, c: d.c, f: d.f, h: false, tilt: rnd(21) - 10 };
-  });
-  state.mod = e.mod || 0;
-  save(); closePop(); render();
-  toast("Put that roll back in the cup.", function(){ restore(snap); });
+function announce(){ // for screen readers: what came up
+  $("said").textContent = "Rolled. " + state.dice.map(function(d){
+    var t = typeOf(d.type); return dieName(t) + " " + (d.f == null ? "not rolled" : faceLabel(t, d.f)) + (d.h ? " (held)" : "");
+  }).join(", ") + ".";
 }
 
 /* ===== Rendering ===== */
 function fit(n, W, H){ // biggest die size that fits n dice in the tray without scrolling
-  for (var s = 136; s > 40; s -= 2){
+  for (var s = 150; s > 40; s -= 2){
     var g = Math.round(s * .24), cols = Math.max(1, Math.floor((W + g) / (s + g))), rows = Math.ceil(n / cols);
     if (rows * (s + g) - g <= H) return { s: s, g: g };
   }
@@ -273,14 +217,14 @@ function fit(n, W, H){ // biggest die size that fits n dice in the tray without 
 function dieButton(d, size){
   var t = typeOf(d.type);
   var label = dieName(t) + (d.c !== "ivory" && !t.fixed ? ", " + d.c : "") + (d.f == null ? ", not rolled" : ", " + faceLabel(t, d.f)) + (d.h ? ", held" : "");
-  return '<button class="die' + (d.h ? " held" : "") + (d.id === fresh ? " new" : "") + '" data-id="' + d.id + '" data-c="' + d.c +
+  return '<button class="die' + (d.h ? " held" : "") + (fresh.indexOf(d.id) >= 0 ? " new" : "") + '" data-id="' + d.id + '" data-c="' + d.c +
          '" style="--s:' + size + 'px;--tilt:' + (d.tilt || 0) + 'deg" aria-label="' + esc(label) + '"><svg viewBox="0 0 100 100" aria-hidden="true">' +
          dieSVG(t, d.f) + '</svg></button>';
 }
 function renderTray(){
   var tray = $("tray"), n = state.dice.length;
   if (!n){
-    tray.innerHTML = '<div class="empty"><b>The cup is empty</b><span>Tap a die on the shelf to put it in.</span></div>';
+    tray.innerHTML = '<div class="empty"><b>The cup is empty</b><button class="ghost strong" data-goto="dice">Choose dice</button></div>';
     return;
   }
   var cs = getComputedStyle(tray);
@@ -288,49 +232,9 @@ function renderTray(){
   var H = tray.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
   var f = fit(n, W, H);
   var anyRolled = state.dice.some(function(d){ return d.f != null; });
-  tray.innerHTML = '<div class="dice" style="--g:' + f.g + 'px">' +
-    state.dice.map(function(d){ return dieButton(d, f.s); }).join("") + '</div>' +
-    '<div class="hint">' + (anyRolled ? "Tap a die to hold it · press and hold to take it out" : "Press and hold a die to take it out") + '</div>';
-  fresh = null;
-}
-function renderResults(){
-  var box = $("results");
-  box.classList.toggle("rolling", rolling);
-  if (rolling) return;
-  var rolled = state.dice.filter(function(d){ return d.f != null; }), waiting = state.dice.length - rolled.length;
-  var hasNumeric = state.dice.some(function(d){ return isNumeric(typeOf(d.type)); });
-  var h = "";
-  if (!rolled.length){
-    h = '<div class="waiting">' + (state.dice.length ? "Ready when you are: " + esc(summary(state.dice)) + "." : "Add some dice from the shelf.") + '</div>';
-  } else {
-    var tot = totals(rolled);
-    if (tot.count){
-      var grand = tot.sum + state.mod;
-      h += '<div class="total"><b>' + esc(fmtNum(grand, tot.allSigned && !state.mod)) + '</b><span>' +
-           (state.mod ? esc(fmtNum(tot.sum, tot.allSigned)) + " " + (state.mod > 0 ? "+" : "−") + " " + Math.abs(state.mod) : "total") + '</span></div>';
-    }
-    h += '<ul class="lines">' + groups(rolled).map(function(g){
-      var faces = g.dice.map(function(d){
-        var face = g.t.faces[d.f], dot = face.g === "swatch" ? '<span class="dot" style="background:var(--cd-' + face.t.toLowerCase() + ')"></span>' : "";
-        return '<i' + (d.h ? ' class="held"' : "") + '>' + dot + esc(faceText(g.t, d.f)) + '</i>';
-      }).join("");
-      var extra = "";
-      if (isNumeric(g.t) && g.dice.length > 1){
-        var s = totals(g.dice);
-        extra = '<span class="sum">= <b>' + esc(fmtNum(s.sum, s.allSigned)) + '</b></span>';
-      } else if (!isNumeric(g.t) && g.dice.length > 2){ // tally the symbols
-        var tally = {}, order = [];
-        g.dice.forEach(function(d){ var k = faceText(g.t, d.f); if (!tally[k]){ tally[k] = 0; order.push(k); } tally[k]++; });
-        if (order.length < g.dice.length) extra = '<span class="sum">' + order.map(function(k){ return esc(k) + " ×" + tally[k]; }).join(", ") + '</span>';
-      }
-      return '<li><span class="what">' + esc(groupName(g)) + (g.showColour ? ' <small>' + g.c + '</small>' : "") + '</span><span class="faces">' + faces + '</span>' + extra + '</li>';
-    }).join("") + (waiting ? '<li><span class="sum">+ ' + waiting + " new " + (waiting > 1 ? "dice" : "die") + " not rolled yet</span></li>" : "") + '</ul>';
-  }
-  if (hasNumeric){
-    h += '<div class="mod"><span class="label">Modifier</span><div class="stepper"><button data-mod="-1" aria-label="Modifier down">−</button><output>' +
-         esc(signed(state.mod)) + '</output><button data-mod="1" aria-label="Modifier up">+</button></div></div>';
-  }
-  box.innerHTML = h;
+  tray.innerHTML = '<div class="dice" style="--g:' + f.g + 'px">' + state.dice.map(function(d){ return dieButton(d, f.s); }).join("") + '</div>' +
+    (anyRolled ? '<div class="hint">Tap a die to hold it for the next roll</div>' : "");
+  fresh = [];
 }
 function renderControls(){
   var free = state.dice.filter(function(d){ return !d.h; }).length, held = state.dice.length - free;
@@ -340,31 +244,37 @@ function renderControls(){
   b.setAttribute("aria-label", !free ? "Every die is held" : "Roll " + free + (free > 1 ? " dice" : " die"));
   $("releaseBtn").hidden = !held;
   $("releaseBtn").textContent = "Release " + held;
-  $("clearBtn").disabled = !state.dice.length;
   $("soundBtn").setAttribute("aria-pressed", String(state.sound));
-  $("soundBtn").textContent = state.sound ? "Sound on" : "Sound off";
 }
-function shelfItem(id){
-  var t = typeOf(id), n = 0;
-  state.dice.forEach(function(d){ if (d.type === id) n++; });
-  var c = t.fixed || state.colour;
-  return '<div class="item"><button class="add' + (n ? " has" : "") + '" data-add="' + esc(id) + '" aria-label="Add a ' + esc(dieName(t)) + (n ? " (" + n + " in the cup)" : "") + '">' +
-         '<span class="die" data-c="' + c + '"><svg viewBox="0 0 100 100" aria-hidden="true">' + dieSVG(t, sampleFace(t)) + '</svg></span>' +
-         '<span class="lab">' + esc(t.label) + '</span></button>' +
-         (n ? '<b class="count" aria-hidden="true">' + n + '</b><button class="minus" data-minus="' + esc(id) + '" aria-label="Take out a ' + esc(dieName(t)) + '">−</button>' : "") + '</div>';
+function card(id, wide){
+  var t = typeOf(id), n = count(id), name = dieName(t);
+  return '<div class="card ' + (wide ? "wide" : "small") + (n ? " has" : "") + '">' +
+    '<button class="pick" data-add="' + esc(id) + '" aria-label="Add a ' + esc(name) + '"><span class="die" data-c="' + (t.fixed || state.colour) + '">' +
+      '<svg viewBox="0 0 100 100" aria-hidden="true">' + dieSVG(t, sampleFace(t)) + '</svg></span></button>' +
+    '<div class="info"><b>' + esc(t.label) + '</b>' + (wide && t.desc ? '<p>' + esc(t.desc) + '</p>' : "") +
+      (t.custom ? '<button class="del" data-del="' + esc(id) + '">Remove from shelf</button>' : "") + '</div>' +
+    '<div class="count"><button data-minus="' + esc(id) + '" aria-label="One fewer ' + esc(name) + '"' + (n ? "" : " disabled") + '>−</button>' +
+      '<output>' + n + '</output><button data-add="' + esc(id) + '" aria-label="One more ' + esc(name) + ', ' + n + ' in the cup">+</button></div></div>';
 }
 function renderShelf(){
-  var strip = $("shelf").querySelector(".strip"), top = $("shelf").scrollTop, left = strip ? strip.scrollLeft : 0;
-  $("shelf").innerHTML =
-    '<h2 class="label">Colour for new dice</h2><div class="colours" role="group" aria-label="Colour for new dice">' +
-      COLOURS.map(function(c){ return '<button data-colour="' + c + '" style="--sw:var(--d-' + c + ')" aria-pressed="' + (c === state.colour) + '" aria-label="' + c + '"></button>'; }).join("") + '</div>' +
-    '<div class="strip"><h2 class="label">Standard</h2><div class="racks">' + STANDARD.map(shelfItem).join("") + '</div>' +
-    '<h2 class="label">Specialty</h2><div class="racks">' + SPECIALTY.map(shelfItem).join("") + '</div>' +
-    '<h2 class="label">Your dice</h2><div class="racks">' + state.customs.map(function(c){ return shelfItem(c.id); }).join("") +
-      '<div class="item"><button class="add make" id="makeOpen"><span class="plus" aria-hidden="true">+</span><span class="lab">Make a die</span></button></div></div></div>';
-  $("shelf").scrollTop = top; $("shelf").querySelector(".strip").scrollLeft = left;
+  $("cupSummary").textContent = state.dice.length ? summary() : "Nothing yet. Tap a die below to add it.";
+  $("clearBtn").disabled = !state.dice.length;
+  $("colours").innerHTML = COLOURS.map(function(c){
+    return '<button data-colour="' + c + '" style="--sw:var(--d-' + c + ')" aria-pressed="' + (c === state.colour) + '" aria-label="' + c + '" title="' + c + '"></button>';
+  }).join("");
+  $("standard").innerHTML = STANDARD.map(function(id){ return card(id, false); }).join("");
+  $("specialty").innerHTML = SPECIALTY.map(function(id){ return card(id, true); }).join("");
+  $("custom").innerHTML = state.customs.map(function(c){ return card(c.id, true); }).join("") +
+    '<button class="card make" id="makeOpen"><span class="plus" aria-hidden="true">+</span><span><b>Make a die</b><p>Any number of sides, or faces you write yourself.</p></span></button>';
 }
-function render(){ renderTray(); renderResults(); renderControls(); renderShelf(); }
+function render(){
+  var v = state.view;
+  [].forEach.call($("tabs").children, function(b){ b.setAttribute("aria-selected", String(b.dataset.tab === v)); });
+  $("rollView").hidden = v !== "roll"; $("diceView").hidden = v !== "dice";
+  renderControls();
+  if (v === "roll") renderTray(); else renderShelf();
+}
+function setView(v){ if (rolling) return; state.view = v; save(); render(); }
 
 /* ===== Make a die ===== */
 var makeMode = "sides";
@@ -375,13 +285,7 @@ function setMakeMode(m){
 }
 function sidesValue(){ var n = Math.round(Number($("sidesIn").value)); return isFinite(n) ? Math.max(2, Math.min(1000, n)) : 6; }
 function parseFaces(){ return $("facesIn").value.split(",").map(function(s){ return s.trim().slice(0, 12); }).filter(function(s){ return s; }); }
-function renderMine(){
-  $("mine").hidden = !state.customs.length;
-  $("mine").innerHTML = '<span class="label">On your shelf</span>' + state.customs.map(function(c){
-    var desc = c.sides ? c.sides + " sides" : c.faces.join(", ");
-    return '<div><span>' + esc(c.label) + ' <small>' + esc(desc) + '</small></span><button data-del="' + esc(c.id) + '">Remove</button></div>';
-  }).join("");
-}
+var FACES_NOTE = "Repeat a face to make it come up more often.";
 function makeDie(){
   var c = { id: "c" + Date.now().toString(36) + rnd(1000), label: $("nameIn").value.trim() };
   if (makeMode === "sides"){
@@ -398,23 +302,20 @@ function makeDie(){
 }
 function deleteCustom(id){
   var c = state.customs.filter(function(x){ return x.id === id; })[0]; if (!c) return;
-  var inCup = state.dice.filter(function(d){ return d.type === id; }).length;
+  var inCup = count(id);
   if (inCup && !confirm("Remove " + c.label + " from your shelf? The " + inCup + " in the cup will go too.")) return;
   state.customs = state.customs.filter(function(x){ return x !== c; });
   state.dice = state.dice.filter(function(d){ return d.type !== id; });
   delete customCache[id];
-  save(); renderMine(); render();
+  save(); render();
 }
 
-/* ===== Dialogs and toast ===== */
+/* ===== Dialog and toast ===== */
 var openPop = null, lastFocus = null;
 function showPop(id){
-  closePop();
   lastFocus = document.activeElement;
   openPop = $(id); openPop.hidden = false; $("scrim").hidden = false;
-  var first = openPop.querySelector("input:not([hidden]), button:not(.x)");
-  if (id === "histPop"){ renderHistory(); openPop.querySelector(".x").focus(); }
-  else if (first) first.focus();
+  var first = openPop.querySelector("button:not(.x)"); if (first) first.focus();
 }
 function closePop(){
   if (!openPop) return;
@@ -458,55 +359,29 @@ function buzz(ms){ try { if (navigator.vibrate) navigator.vibrate(ms); } catch(e
 
 /* ===== Events ===== */
 document.addEventListener("pointerdown", unlock, true);
+document.addEventListener("click", function(e){ var b = e.target.closest("[data-goto]"); if (b) setView(b.dataset.goto); });
+$("tabs").addEventListener("click", function(e){ var b = e.target.closest("button"); if (b && b.dataset.tab !== state.view) setView(b.dataset.tab); });
 
-// Tray: tap holds; press-and-hold (or right-click) takes a die out.
-var press = null, ignoreClickUntil = 0;
 var tray = $("tray");
-tray.addEventListener("pointerdown", function(e){
-  var b = e.target.closest(".die"); if (!b || rolling) return;
-  var id = +b.dataset.id;
-  if (e.button === 2){ ignoreClickUntil = Date.now() + 400; removeDie(id); return; }
-  press = { id: id, x: e.clientX, y: e.clientY, timer: setTimeout(function(){
-    press = null; ignoreClickUntil = Date.now() + 600; removeDie(id);
-  }, 550) };
-});
-function cancelPress(){ if (press){ clearTimeout(press.timer); press = null; } }
-tray.addEventListener("pointermove", function(e){ if (press && Math.abs(e.clientX - press.x) + Math.abs(e.clientY - press.y) > 12) cancelPress(); });
-["pointerup", "pointercancel", "pointerleave"].forEach(function(ev){ tray.addEventListener(ev, cancelPress); });
-tray.addEventListener("contextmenu", function(e){ e.preventDefault(); });
-tray.addEventListener("click", function(e){
-  var b = e.target.closest(".die"); if (!b || rolling || Date.now() < ignoreClickUntil) return;
-  toggleHold(+b.dataset.id);
-});
-tray.addEventListener("keydown", function(e){
-  var b = e.target.closest(".die"); if (!b) return;
-  if (e.key === "Delete" || e.key === "Backspace"){
-    e.preventDefault();
-    var next = b.nextElementSibling || b.previousElementSibling, nextId = next && next.dataset.id;
-    removeDie(+b.dataset.id);
-    var f = nextId && tray.querySelector('[data-id="' + nextId + '"]'); if (f) f.focus();
-  }
-});
-
-$("shelf").addEventListener("click", function(e){
-  var b = e.target.closest("button"); if (!b) return;
-  if (b.dataset.add){ addDie(b.dataset.add); var again = $("shelf").querySelector('[data-add="' + b.dataset.add + '"]'); if (again) again.focus(); }
-  else if (b.dataset.minus){ removeOne(b.dataset.minus); var add = $("shelf").querySelector('[data-add="' + b.dataset.minus + '"]'); if (add) add.focus(); }
-  else if (b.dataset.colour){ state.colour = b.dataset.colour; save(); renderShelf(); $("shelf").querySelector('[data-colour="' + state.colour + '"]').focus(); }
-  else if (b.id === "makeOpen"){ renderMine(); setMakeMode(makeMode); $("facesNote").textContent = "Repeat a face to make it come up more often. If every face is a number, they're added to the total."; showPop("makePop"); }
-});
-$("results").addEventListener("click", function(e){
-  var b = e.target.closest("[data-mod]"); if (!b) return;
-  state.mod = Math.max(-99, Math.min(99, state.mod + +b.dataset.mod)); save(); renderResults();
-  var again = $("results").querySelector('[data-mod="' + b.dataset.mod + '"]'); if (again) again.focus();
-});
+tray.addEventListener("click", function(e){ var b = e.target.closest(".die"); if (b && !rolling) toggleHold(+b.dataset.id); });
 $("rollBtn").addEventListener("click", roll);
 $("releaseBtn").addEventListener("click", releaseAll);
-$("clearBtn").addEventListener("click", clearAll);
 $("soundBtn").addEventListener("click", function(){ state.sound = !state.sound; save(); renderControls(); if (state.sound){ unlock(); clatter(2); } });
-$("histBtn").addEventListener("click", function(){ showPop("histPop"); });
-$("histList").addEventListener("click", function(e){ var b = e.target.closest("[data-h]"); if (b) restoreHistory(+b.dataset.h); });
-$("histClear").addEventListener("click", function(){ state.history = []; save(); renderHistory(); });
+
+$("diceView").addEventListener("click", function(e){
+  var b = e.target.closest("button"); if (!b) return;
+  var inCount = !!b.closest(".count"), refocus = null;
+  if (b.dataset.add){ addDie(b.dataset.add); refocus = (inCount ? ".count " : ".pick") + '[data-add="' + b.dataset.add + '"]'; }
+  else if (b.dataset.minus){
+    removeOne(b.dataset.minus);
+    refocus = count(b.dataset.minus) ? '.count [data-minus="' + b.dataset.minus + '"]' : '.count [data-add="' + b.dataset.minus + '"]';
+  }
+  else if (b.dataset.colour){ state.colour = b.dataset.colour; save(); renderShelf(); refocus = '[data-colour="' + state.colour + '"]'; }
+  else if (b.dataset.del) deleteCustom(b.dataset.del);
+  else if (b.id === "clearBtn") clearAll();
+  else if (b.id === "makeOpen"){ setMakeMode(makeMode); $("facesNote").textContent = FACES_NOTE; showPop("makePop"); }
+  var f = refocus && $("diceView").querySelector(refocus); if (f) f.focus();
+});
 
 $("makeMode").addEventListener("click", function(e){ var b = e.target.closest("button"); if (b) setMakeMode(b.dataset.m); });
 $("sideChips").innerHTML = SIDE_CHIPS.map(function(n){ return '<button data-n="' + n + '">d' + n + '</button>'; }).join("");
@@ -515,15 +390,12 @@ $("sMinus").addEventListener("click", function(){ $("sidesIn").value = Math.max(
 $("sPlus").addEventListener("click", function(){ $("sidesIn").value = Math.min(1000, sidesValue() + 1); });
 $("sidesIn").addEventListener("change", function(){ $("sidesIn").value = sidesValue(); });
 $("makeBtn").addEventListener("click", makeDie);
-$("mine").addEventListener("click", function(e){ var b = e.target.closest("[data-del]"); if (b) deleteCustom(b.dataset.del); });
-["makePop", "histPop"].forEach(function(id){
-  $(id).addEventListener("click", function(e){ if (e.target.closest("[data-close]")) closePop(); });
-  $(id).addEventListener("keydown", function(e){ if (e.key === "Enter" && e.target.tagName === "INPUT" && id === "makePop") makeDie(); });
-});
+$("makePop").addEventListener("click", function(e){ if (e.target.closest("[data-close]")) closePop(); });
+$("makePop").addEventListener("keydown", function(e){ if (e.key === "Enter" && e.target.tagName === "INPUT") makeDie(); });
 $("scrim").addEventListener("click", closePop);
 $("toastUndo").addEventListener("click", function(){ var u = toastUndo; $("toast").hidden = true; toastUndo = null; if (u) u(); });
 
-// Space or R rolls (unless you're typing or a dialog is open); Escape closes a dialog.
+// Space or R rolls on the Roll tab (unless you're typing or the dialog is open); Escape closes the dialog.
 document.addEventListener("keydown", function(e){
   if (e.key === "Escape"){ closePop(); return; }
   if (openPop || e.metaKey || e.ctrlKey || e.altKey) return;
@@ -533,9 +405,9 @@ document.addEventListener("keydown", function(e){
 });
 document.addEventListener("gesturestart", function(e){ e.preventDefault(); });
 
-// Re-fit the dice when the tray changes size (rotation, window resize)
+// Re-fit the dice when the tray changes size (rotation, window resize, switching tabs)
 var lastSize = "";
-function refit(){ var s = tray.clientWidth + "x" + tray.clientHeight; if (s !== lastSize && !rolling){ lastSize = s; renderTray(); } }
+function refit(){ var s = tray.clientWidth + "x" + tray.clientHeight; if (s !== lastSize && !rolling && state.view === "roll"){ lastSize = s; renderTray(); } }
 if (window.ResizeObserver) new ResizeObserver(refit).observe(tray); else window.addEventListener("resize", refit);
 
 render();
