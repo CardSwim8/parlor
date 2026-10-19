@@ -1,0 +1,30 @@
+/* Dice Cup brand: a games-room dice tray. Oxblood felt in a dark walnut room, ivory dice, brass
+   accents and engraved lettering.
+   Applied by <html class="brand-dice-cup"> on the page and by .brand-dice-cup on the hub card. */
+html.brand-dice-cup,.brand-dice-cup{
+  color-scheme:dark;
+  --bg:#1f1714; --bg2:#150f0d; --bg-glow:#2e211c;
+  --text:#f3e9dc; --muted:#bba795;
+  --well:rgba(0,0,0,.3); --soft:rgba(255,255,255,.08); --line:rgba(243,233,220,.22);
+  --surface:#6d1f2b; --surface-hi:#86293a; --surface-edge:#4a131c;
+  --tile:#f5eedd; --tile-hi:#fffaf0; --tile-shade:#d8cdb6;
+  --paper:#fbf6ec; --ink:#2a1d14; --ink-soft:#4a3a2e; --ink-faint:#8f7f70;
+  --accent:#e2b04a; --accent-ink:#2a1c00; --accent-edge:#a37a22; --accent-soft:#f0d38f;
+  --warn:#ff6b57;
+  /* dice bodies (--d-*) and the pips/numbers on them (--d-*-ink) */
+  --d-ivory:#f5eedd; --d-ivory-ink:#2a1d14;
+  --d-red:#c4362c; --d-red-ink:#fff6ec;
+  --d-blue:#2d5ea8; --d-blue-ink:#ffffff;
+  --d-green:#2c8553; --d-green-ink:#ffffff;
+  --d-gold:#e6b23a; --d-gold-ink:#2a1c00;
+  --d-purple:#6a43a6; --d-purple-ink:#ffffff;
+  --d-black:#25211e; --d-black-ink:#f3e9dc;
+  --suit-red:#c4362c;
+  /* faces of the colour die */
+  --cd-red:#d93a2f; --cd-orange:#f08a24; --cd-yellow:#f5d02c; --cd-green:#2e9e5b; --cd-blue:#2f6fd0; --cd-purple:#7d4cc2;
+  --font:"Avenir Next","Segoe UI","Helvetica Neue",Arial,sans-serif;
+  --font-display:"Copperplate","Copperplate Gothic Light","Big Caslon","Georgia",serif;
+  --display-weight:700; --display-case:none; --display-spacing:.04em;
+  --r-lg:18px; --r-md:14px; --r-sm:10px; --r-tile:18%;
+  --lift:0 12px 30px rgba(0,0,0,.45);
+}

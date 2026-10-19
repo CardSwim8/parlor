@@ -3,17 +3,18 @@
    Later visits: opens instantly from the saved copy, even offline, and quietly checks
    the website for updates in the background (picked up on the next launch).
    When you add a game or change the list of files below, also change CACHE so devices refresh it. */
-const CACHE = "parlor-v7";
+const CACHE = "parlor-v8";
 // Only the games listed on the hub are cached; the others in the repo still open online.
 const FILES = [
   "./", "./index.html", "./manifest.webmanifest", "./icons/icon-180.png", "./icons/icon-512.png",
-  "./icons/tumbleword-180.png", "./icons/cover-story-180.png", "./icons/triad-180.png",
+  "./icons/tumbleword-180.png", "./icons/cover-story-180.png", "./icons/triad-180.png", "./icons/dice-cup-180.png",
   "./shared/theme.css", "./shared/core.js", "./shared/vendor/fflate.min.js", "./shared/words/nouns.js",
   "./tumbleword/", "./tumbleword/index.html", "./tumbleword/brand.css", "./tumbleword/card.html", "./tumbleword/card.css",
   "./tumbleword/tumbleword.js", "./tumbleword/dict-words.bin", "./tumbleword/dict-defs.bin",
   "./cover-story/", "./cover-story/index.html", "./cover-story/brand.css", "./cover-story/card.html", "./cover-story/card.css",
   "./cover-story/cover-story.js",
-  "./triad/", "./triad/index.html", "./triad/brand.css", "./triad/card.html", "./triad/card.css", "./triad/triad.js"
+  "./triad/", "./triad/index.html", "./triad/brand.css", "./triad/card.html", "./triad/card.css", "./triad/triad.js",
+  "./dice-cup/", "./dice-cup/index.html", "./dice-cup/brand.css", "./dice-cup/card.html", "./dice-cup/card.css", "./dice-cup/dice-cup.js"
 ];
 
 self.addEventListener("install", (e) => {

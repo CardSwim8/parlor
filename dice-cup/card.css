@@ -1,0 +1,11 @@
+/* Hub card art for this game (loaded by the Parlor hub with brand.css). */
+/* Dice Cup: a handful of dice on the felt */
+.art.cup{gap:10px}
+.art.cup svg{width:62px;height:62px;filter:drop-shadow(0 4px 3px rgba(0,0,0,.45))}
+.art.cup svg:nth-child(1){transform:rotate(-9deg)} .art.cup svg:nth-child(2){transform:rotate(6deg) translateY(-6px)}
+.art.cup svg:nth-child(3){transform:rotate(-4deg) translateY(5px)} .art.cup svg:nth-child(4){transform:rotate(11deg)}
+.art.cup .b{fill:var(--b);stroke:rgba(0,0,0,.3);stroke-width:2}
+.art.cup circle{fill:var(--p)}
+.art.cup .l{fill:none;stroke:var(--p);stroke-opacity:.3;stroke-width:2;stroke-linejoin:round}
+.art.cup text{fill:var(--p);font-family:var(--font);font-weight:800;font-size:25px;text-anchor:middle;dominant-baseline:central}
+@media (max-width:480px){ .art.cup svg{width:52px;height:52px} }
